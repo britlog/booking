@@ -1,0 +1,45 @@
+{% extends "templates/web.html" %}
+
+{% block title %} {{_("Consultation du solde de cours de votre abonnement")}} {% endblock %}
+
+{% block header %}<h1>{{_("Consultation du solde de cours de votre abonnement")}}</h1>{% endblock %}
+{% block page_content %}
+
+<div class="row" style="margin-top: 40px; margin-bottom: 10px">
+	<div class="col-sm-6">
+        <form id="solde">
+			<div class="form-group">
+				<input id="customer_id" type="email"
+					class="form-control" placeholder="{{ _('Your email address') }}...">
+			</div>
+			<div class="form-group">
+				<button type="submit" id="update"
+					class="btn btn-primary">{{_("Valider")}}</button>
+			</div>
+			<p id="contact-alert" class="alert alert-warning"
+				style="display: none;"></p>
+        </form>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-6">
+		<table id="matable" style="width:100%;display: none;">
+		</table>
+	</div>
+</div>
+
+<script>
+var msgprint = function(txt) {
+	if(txt) $("#contact-alert").html(txt).toggle(true);
+}
+</script>
+<script type="text/javascript" src="solde-cours.js"></script>
+
+{% endblock %}
+
+{% block style %}
+<style>
+
+</style>
+{% endblock %}
