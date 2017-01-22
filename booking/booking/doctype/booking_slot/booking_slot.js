@@ -1,11 +1,26 @@
 // Copyright (c) 2016, Britlog and contributors
 // For license information, please see license.txt
 
+var CustomerClassesUpdate = false;  //Update customer remaining classes if present is checked
+
 frappe.ui.form.on('Booking Slot', {
 	refresh: function(frm) {
-
+        if (CustomerClassesUpdate) {
+            //frappe.msgprint("REFRESH");
+            frappe.call({
+                method: "booking.booking.doctype.booking_slot.booking_slot.update_customers",
+                args: {
+                    "slot": frm.doc.name
+                },
+                callback: function(r) {
+                    //frappe.msgprint(r.message);
+                }
+            });
+            CustomerClassesUpdate = false;
+        }
 	}
 });
+
 
 frappe.ui.form.on('Booking Slot', "total_places", function(frm) {
 
@@ -36,7 +51,8 @@ frappe.ui.form.on('Booking Subscriber', {
     }
 });
 
-//frappe.ui.form.on("Booking Subscriber", "present", function(frm,cdt,cdn) {
+frappe.ui.form.on("Booking Subscriber", "present", function(frm,cdt,cdn) {
+    CustomerClassesUpdate = true;
 //    var customer = frappe.get_doc(cdt, cdn);
 //    frappe.msgprint(customer.subscriber);
 //
@@ -49,5 +65,5 @@ frappe.ui.form.on('Booking Subscriber', {
 //                //frappe.msgprint(r.message);
 //            }
 //    });
-//
-//});
+
+});

@@ -12,19 +12,20 @@ class BookingSlot(Document):
 
         self.name = frappe.utils.format_datetime(self.time_slot,"EEEE dd/MM/yyyy HH:mm").capitalize()
 
-    def on_update(self):
-
-        # get all subscribers of this slot
-        subscribers = frappe.get_all("Booking Subscriber", filters={'parent': self.name},
-                                     fields=['subscriber', 'present'])
-
-        for fields in subscribers:
-            # get subscriber's remaining classes including this class slot update
-            doc = frappe.get_doc('Customer', fields.subscriber)
-            doc.subscription_remaining_classes = get_remaining_classes(doc.name,doc.subscription_total_classes)
-
-            # save the document to the database
-            doc.save()
+    # def on_update(self):
+    #
+    #     # update customer subscription whether present in class or not
+    #     # get all subscribers of this slot
+    #     subscribers = frappe.get_all("Booking Subscriber", filters={'parent': self.name},
+    #                                  fields=['subscriber', 'present'])
+    #
+    #     for fields in subscribers:
+    #         # get subscriber's remaining classes including this class slot update
+    #         doc = frappe.get_doc('Customer', fields.subscriber)
+    #         doc.subscription_remaining_classes = get_remaining_classes(doc.name,doc.subscription_total_classes)
+    #
+    #         # save the document to the database
+    #         doc.save()
 
 
 @frappe.whitelist()
@@ -32,6 +33,21 @@ def refresh_available_places(slot,total_places):
 
     return str( int(total_places) - frappe.db.count("Booking",{"slot": ["=", slot]})
         - frappe.db.count("Booking Subscriber", {"parent": ["=", slot]}) )
+
+@frappe.whitelist()
+def update_customers(slot):
+
+    # get all subscribers of this slot
+    subscribers = frappe.get_all("Booking Subscriber", filters={'parent': slot},
+                                 fields=['subscriber', 'present'])
+
+    for fields in subscribers:
+        # get subscriber's remaining classes including this class slot update
+        doc = frappe.get_doc('Customer', fields.subscriber)
+        doc.subscription_remaining_classes = get_remaining_classes(doc.name,doc.subscription_total_classes)
+
+        # save the Customer Doctype to the database
+        doc.save()
 
 @frappe.whitelist()
 def get_remaining_classes(customer_id,total_classes):

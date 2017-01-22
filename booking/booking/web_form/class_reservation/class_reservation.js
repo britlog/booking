@@ -13,8 +13,10 @@ frappe.ready(function() {
         callback: function(r) {
                 console.log(r.message);
                 var options = [];
+                var pluriel = "";
                 (r.message || []).forEach(function(row){
-                    $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" "+row.type+" - "+row.available_places+" PLACES DISPONIBLES"));
+                    if (row.available_places>1) { pluriel = "S"; } else { pluriel = ""; }
+                    $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" "+row.type+" - "+row.available_places+" PLACE"+pluriel+" DISPONIBLE"+pluriel));
                     //$('select option:contains("'+row.name+'")').text(row.name+" "+row.type+" - "+row.available_places+" PLACES DISPONIBLES");
                 });
 
