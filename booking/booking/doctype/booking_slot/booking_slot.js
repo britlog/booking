@@ -43,11 +43,13 @@ frappe.ui.form.on('Booking Subscriber', {
     subscribers_remove: function(frm) {
         frm.doc.available_places += 1;
         refresh_field("available_places");
+        CustomerClassesUpdate = true;
 
     },
     subscribers_add: function(frm) {
         frm.doc.available_places -= 1;
         refresh_field("available_places");
+        CustomerClassesUpdate = true;
     }
 });
 

@@ -20,7 +20,7 @@ frappe.ready(function() {
 			args: args,
 			callback: function(r) {
 				if(r.message) {
-                    console.log(r.message);
+                    //console.log(r.message);
                     var remaining_classes = r.message[0].classes;
                     var validity_date = r.message[0].validity;
                     //frappe.msgprint("Il vous reste "+num.toString()+" cours");
