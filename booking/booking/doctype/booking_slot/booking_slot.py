@@ -52,6 +52,9 @@ def update_customers(slot):
 @frappe.whitelist()
 def get_remaining_classes(customer_id,total_classes,start_date):
 
+    if not total_classes:
+        total_classes=0
+
     classes = int(total_classes) - frappe.db.sql("""select COUNT(*)
         from `tabBooking Subscriber`
         inner join `tabBooking Slot` on `tabBooking Subscriber`.parent=`tabBooking Slot`.name

@@ -11,7 +11,7 @@ frappe.ready(function() {
 		}
 
 		if(!args.email_id) {
-			frappe.msgprint("Votre adresse email est obligatoire")
+			frappe.msgprint("Votre adresse email est obligatoire");
 			return;
 		}
 
@@ -23,8 +23,14 @@ frappe.ready(function() {
                     //console.log(r.message);
                     var remaining_classes = r.message[0].classes;
                     var validity_date = r.message[0].validity;
+                    var total_classes = r.message[0].total_classes;
+
+                    if(!validity_date)
+                        validity_date = "";
+                    else validity_date = " jusqu'au "+validity_date;
+
                     //frappe.msgprint("Il vous reste "+num.toString()+" cours");
-                    msgprint("Il vous reste "+remaining_classes.toString()+" cours à suivre jusqu'au "+validity_date);
+                    msgprint("Il vous reste "+remaining_classes.toString()+" cours (sur "+total_classes+")"+validity_date);
                 }
                 else msgprint("Adresse email non reconnue, veuillez contacter Santani Yoga");
 

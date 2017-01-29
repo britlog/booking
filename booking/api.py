@@ -7,7 +7,8 @@ def get_solde(email_id):
     return frappe.db.sql("""
     select
         IFNULL(tabCustomer.subscription_remaining_classes,0) AS classes,
-        DATE_FORMAT(tabCustomer.subscription_end_date,%(str)s) AS validity
+        DATE_FORMAT(tabCustomer.subscription_end_date,%(str)s) AS validity,
+        IFNULL(tabCustomer.subscription_total_classes,0) AS total_classes
     from `tabCustomer`
     inner join `tabContact` on tabCustomer.name=tabContact.customer
     where tabContact.email_id = %(email)s""",
