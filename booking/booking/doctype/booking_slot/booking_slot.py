@@ -29,10 +29,12 @@ class BookingSlot(Document):
 
 
 @frappe.whitelist()
-def refresh_available_places(slot,total_places):
+def refresh_available_places(slot,total_places,nb_subscribers):
 
     return str( int(total_places) - frappe.db.count("Booking",{"slot": ["=", slot]})
-        - frappe.db.count("Booking Subscriber", {"parent": ["=", slot]}) )
+        # - frappe.db.count("Booking Subscriber", {"parent": ["=", slot]})
+          - int(nb_subscribers)
+    )
 
 @frappe.whitelist()
 def update_customers(slot):

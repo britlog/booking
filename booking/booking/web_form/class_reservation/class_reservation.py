@@ -24,4 +24,4 @@ def get_slot():
 		filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
 				 ["Booking Slot", "available_places", ">", 0],
 				 ["Booking Slot", "show_in_website", "=", 1]],
-		order_by="time_slot desc")
+		order_by="time_slot asc")

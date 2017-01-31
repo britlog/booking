@@ -23,12 +23,14 @@ frappe.ui.form.on('Booking Slot', {
 
 
 frappe.ui.form.on('Booking Slot', "total_places", function(frm) {
+    var tbl = frm.doc.subscribers || [];
 
     frappe.call({
             method: "booking.booking.doctype.booking_slot.booking_slot.refresh_available_places",
             args: {
                 "slot": frm.doc.name,
-                "total_places": frm.doc.total_places
+                "total_places": frm.doc.total_places,
+                "nb_subscribers": tbl.length
             },
             callback: function(r) {
                 //frappe.msgprint(r.message);
