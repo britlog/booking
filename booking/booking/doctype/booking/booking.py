@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2015, Britlog and contributors
+# Copyright (c) 2016, Britlog and contributors
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
@@ -17,7 +17,7 @@ class Booking(Document):
         # set property to the document
         doc.available_places -= 1
 
-        # save a document to the database
+        # save document to the database
         doc.save()
 
         # send email notification
@@ -62,6 +62,37 @@ class Booking(Document):
                 send_sms(receiver_list,message,'',False)
             except Exception as e:
                 frappe.log_error(frappe.get_traceback(), 'SMS failed')  # Otherwise, booking is not registered in database if errors
+
+        # always send notification email to company master
+        forward_to_email = frappe.db.get_value("Contact Us Settings", None, "forward_to_email")
+        if forward_to_email:
+            messages = (
+                _("Bonjour"),
+                _("J'ai le plaisir de vous informer de la réservation n°"),
+                self.name,
+                _("pour le"),
+                self.slot,
+                _("Nom"),
+                self.full_name,
+                _("Commentaire"),
+                self.comment,
+                url
+            )
+
+            content = """
+                <div style="font-family: verdana; font-size: 16px;">
+                <p>{0},<p>
+                <p>{1} {2} {3}</p>
+                <p><strong>{4}</strong></p>
+                <p>{5} : {6}</p>
+                <p>{7} : {8}</p>
+                <img alt="Santani Yoga" src="{9}">
+                </div>
+                """
+            try:
+                frappe.sendmail(recipients=forward_to_email, sender=email, content=content.format(*messages), subject=_("Nouvelle réservation"))
+            except Exception as e:
+                frappe.log_error(frappe.get_traceback(),'email to company failed')  # Otherwise, booking is not registered in database if errors
 
 
     def on_trash(self):

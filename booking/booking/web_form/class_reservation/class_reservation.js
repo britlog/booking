@@ -15,8 +15,8 @@ frappe.ready(function() {
                 var options = [];
                 var pluriel = "";
                 (r.message || []).forEach(function(row){
-                    if (row.available_places>1) { pluriel = "S"; } else { pluriel = ""; }
-                    $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" "+row.type+" - "+row.available_places+" PLACE"+pluriel+" DISPONIBLE"+pluriel));
+                    if (row.available_places>1) { pluriel = "s"; } else { pluriel = ""; }
+                    $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" | "+row.type.toUpperCase()+" | "+row.available_places+" place"+pluriel+" disponible"+pluriel));
                     //$('select option:contains("'+row.name+'")').text(row.name+" "+row.type+" - "+row.available_places+" PLACES DISPONIBLES");
                 });
 
@@ -38,14 +38,8 @@ frappe.ready(function() {
 		var phone = $('[name="phone"]').val();
 		var sms = $('[name="confirm_sms"]').is(':checked');
 
-		if(!email && !phone) {
-			frappe.msgprint(__("Entrez s'il vous plaît un email ou \
-				téléphone pour vous joindre. Merci !"));
-			return false;
-		}
-
 		if(email && !valid_email(email)) {
-            frappe.msgprint(__("Entrez s'il vous plaît une adresse email valide."));
+            frappe.msgprint(__("Entrez s'il vous plaît une adresse e-mail valide."));
             $('[name="email_id"]').focus();
             return false;
 		}
