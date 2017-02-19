@@ -18,7 +18,7 @@
  "is_standard": 1, 
  "login_required": 0, 
  "max_attachment_size": 0, 
- "modified": "2017-02-05 17:54:54.829321", 
+ "modified": "2017-02-19 21:35:47.893946", 
  "modified_by": "Administrator", 
  "module": "Booking", 
  "name": "class-reservation", 
@@ -34,12 +34,12 @@
  "web_form_fields": [
   {
    "fieldname": "slot", 
-   "fieldtype": "Link", 
+   "fieldtype": "Select", 
    "hidden": 0, 
    "label": "Cours", 
    "max_length": 0, 
    "max_value": 0, 
-   "options": "Booking Slot", 
+   "options": "", 
    "read_only": 0, 
    "reqd": 1
   }, 

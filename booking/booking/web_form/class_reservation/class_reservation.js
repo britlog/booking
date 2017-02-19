@@ -11,7 +11,7 @@ frappe.ready(function() {
             //'type': 'Vinyasa'
         },
         callback: function(r) {
-                console.log(r.message);
+                //console.log(r.message);
                 var options = [];
                 var pluriel = "";
                 (r.message || []).forEach(function(row){
