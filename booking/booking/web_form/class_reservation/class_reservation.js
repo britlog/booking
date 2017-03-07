@@ -25,13 +25,14 @@ frappe.ready(function() {
 
     function valid_phone(id,mobile) {
         if (mobile)
-            return (id.search("(0|\\+33|0033)[6-7][0-9]{8}")==-1) ? 0 : 1;
+            return (id.search("0[6-7][0-9]{8}")==-1) ? 0 : 1;
         else
-            return (id.search("(0|\\+33|0033)[1-9][0-9]{8}")==-1) ? 0 : 1;
+            return (id.search("0[1-9][0-9]{8}")==-1) ? 0 : 1;
     }
 
     clickListener = jQuery._data($('.btn-form-submit')[0], 'events').click[0]; // caching the first .click bind
     $('.btn-form-submit').off('click'); // removing all binds
+    $('.btn-form-submit').text('Envoyer');    // rename button
 
     $('.btn-form-submit').on("click", function() {
 		var email = $('[name="email_id"]').val();
@@ -44,11 +45,13 @@ frappe.ready(function() {
             return false;
 		}
 
-		if(phone && !valid_phone(phone,sms)) {
-            frappe.msgprint(__("Entrez s'il vous plaît un numéro de téléphone valide.\
-                Un numéro de portable est nécessaire si vous avez demandé une confirmation par SMS."));
-            $('[name="phone"]').focus();
-            return false;
+		if(phone || sms) {
+            if (!valid_phone(phone,sms)) {
+                frappe.msgprint(__("Entrez s'il vous plaît un numéro de téléphone valide.\
+                    Un numéro de portable est nécessaire si vous avez demandé une confirmation par SMS."));
+                $('[name="phone"]').focus();
+                return false;
+            }
 		}
 
         $('.btn-form-submit').off('click');                 // removing all binds

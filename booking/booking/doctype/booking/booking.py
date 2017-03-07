@@ -109,6 +109,23 @@ class Booking(Document):
         # check available places before saving
         doc = frappe.get_doc("Booking Slot", self.slot)
 
-        # Raise error
+        # raise error
         if doc.available_places <= 0 :
-             frappe.throw("Plus de place à cette séance, veuillez svp rafraîchir votre navigateur")
+            frappe.throw("Plus de place à cette séance, veuillez s'il vous plaît rafraîchir votre navigateur")
+
+        # check if already registered
+        booked = frappe.db.sql("""select COUNT(*)
+                 from `tabBooking`
+                 where `tabBooking`.slot = %(slot)s and `tabBooking`.email_id = %(email)s""",
+                 {"slot": self.slot, "email": self.email_id})[0][0]
+
+        booked += frappe.db.sql("""select COUNT(*)
+                 from `tabBooking Subscriber`
+                 inner join `tabCustomer` on `tabBooking Subscriber`.subscriber = tabCustomer.name
+                 inner join `tabContact` on tabCustomer.name=tabContact.customer
+                 where `tabBooking Subscriber`.parent = %(slot)s and `tabContact`.email_id = %(email)s""",
+                 {"slot": self.slot, "email": self.email_id})[0][0]
+
+        # raise error
+        if booked > 0 :
+            frappe.throw("Vous êtes déjà inscrit à cette séance")
