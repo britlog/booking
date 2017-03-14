@@ -11,16 +11,25 @@ frappe.ready(function() {
             //'type': 'Vinyasa'
         },
         callback: function(r) {
-                //console.log(r.message);
-                var options = [];
-                var pluriel = "";
-                (r.message || []).forEach(function(row){
-                    if (row.available_places>1) { pluriel = "s"; } else { pluriel = ""; }
-                    $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" | "+row.type.toUpperCase()+" | "+row.available_places+" place"+pluriel+" disponible"+pluriel));
-                    //$('select option:contains("'+row.name+'")').text(row.name+" "+row.type+" - "+row.available_places+" PLACES DISPONIBLES");
-                });
+            //console.log(r.message);
+            var options = [];
+            var available_message = "";
+            (r.message || []).forEach(function(row){
+                if (row.available_places == 0) {
+                    available_message = "Complet";
+                }
+                else if (row.available_places == 1) {
+                    available_message = "1 place disponible";
+                }
+                else {
+                    available_message = row.available_places+" places disponibles";
+                }
+                $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" | "+row.type.toUpperCase()+" | "+available_message));
 
-            }
+                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
+            });
+
+        }
     });
 
     function valid_phone(id,mobile) {
