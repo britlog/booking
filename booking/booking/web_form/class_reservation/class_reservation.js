@@ -34,9 +34,9 @@ frappe.ready(function() {
 
     function valid_phone(id,mobile) {
         if (mobile)
-            return (id.search("0[6-7][0-9]{8}")==-1) ? 0 : 1;
+            return (id.search("^0[6-7][0-9]{8}$")==-1) ? 0 : 1;
         else
-            return (id.search("0[1-9][0-9]{8}")==-1) ? 0 : 1;
+            return (id.search("^0[1-9][0-9]{8}$")==-1) ? 0 : 1;
     }
 
     clickListener = jQuery._data($('.btn-form-submit')[0], 'events').click[0]; // caching the first .click bind
