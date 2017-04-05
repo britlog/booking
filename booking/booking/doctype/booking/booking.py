@@ -116,8 +116,9 @@ class Booking(Document):
         # check if already registered
         booked = frappe.db.sql("""select COUNT(*)
                  from `tabBooking`
-                 where `tabBooking`.slot = %(slot)s and `tabBooking`.email_id = %(email)s""",
-                 {"slot": self.slot, "email": self.email_id})[0][0]
+                 where `tabBooking`.slot = %(slot)s and `tabBooking`.email_id = %(email)s
+                 and `tabBooking`.name <> %(name)s""",
+                 {"slot": self.slot, "email": self.email_id, "name": self.name})[0][0]
 
         booked += frappe.db.sql("""select COUNT(*)
                  from `tabBooking Subscriber`
