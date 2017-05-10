@@ -123,7 +123,8 @@ class Booking(Document):
         booked += frappe.db.sql("""select COUNT(*)
                  from `tabBooking Subscriber`
                  inner join `tabCustomer` on `tabBooking Subscriber`.subscriber = tabCustomer.name
-                 inner join `tabContact` on tabCustomer.name=tabContact.customer
+                 inner join `tabDynamic Link` on tabCustomer.name=`tabDynamic Link`.link_name
+                 inner join `tabContact` on `tabDynamic Link`.parent=tabContact.name
                  where `tabBooking Subscriber`.parent = %(slot)s and `tabContact`.email_id = %(email)s""",
                  {"slot": self.slot, "email": self.email_id})[0][0]
 
