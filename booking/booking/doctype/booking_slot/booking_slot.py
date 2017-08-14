@@ -90,3 +90,34 @@ def get_remaining_classes(customer_id,total_classes,start_date):
     #     classes -= lost  # lost classes
 
     return max(0,classes)
+
+def send_notification_email(slot):
+	# get all notifications of this slot
+	notifications = frappe.get_all("Booking Notification", filters={'parent': slot, 'sending_date': ''},
+								 fields=['email_id'])
+
+	for fields in notifications:
+
+		messages = (
+			_("Bonjour"),
+			_("Une place vient de se libérer pour le cours de yoga du"),
+			slot,
+			_("Je vous invite à vous inscrire sur le site. Merci."),
+			_("Namasté")
+		)
+
+		content = """
+			<div style="font-family: verdana; font-size: 16px;">
+			<p>{0},<p>
+			<p>{1}</p>
+			<p><strong>{2}</strong></p>
+			<p>{3}</p>
+			<p>{4},<br>Tonya</p>
+			</div>
+			"""
+
+		try:
+			frappe.sendmail(fields.email_id, subject=_("Place disponible pour le cours de yoga"), content=content.format(*messages))
+		except Exception as e:
+			frappe.log_error(frappe.get_traceback(),
+							 'email failed')  # Otherwise, booking is not registered in database if errors

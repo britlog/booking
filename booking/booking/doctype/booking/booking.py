@@ -104,6 +104,11 @@ class Booking(Document):
         # save a document to the database
         doc.save()
 
+        # send notification email if customer ask for warning
+        if doc.available_places == 1 :
+            frappe.throw("RRR")
+
+
     def validate(self):
 
         # check available places before saving

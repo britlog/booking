@@ -25,3 +25,12 @@ def get_slot():
 				 ["Booking Slot", "available_places", ">=", 0],
 				 ["Booking Slot", "show_in_website", "=", 1]],
 		order_by="time_slot asc")
+
+@frappe.whitelist(allow_guest=True)
+def set_notification(slot, email):
+	doc = frappe.get_doc("Booking Slot", slot)
+	doc.append("notifications", {
+		"email_id": email,
+		"request_date": datetime.datetime.now()
+	})
+	doc.save()
