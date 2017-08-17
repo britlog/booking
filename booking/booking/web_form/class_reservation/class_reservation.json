@@ -18,7 +18,7 @@
  "is_standard": 1, 
  "login_required": 0, 
  "max_attachment_size": 0, 
- "modified": "2017-08-17 19:44:24.276756", 
+ "modified": "2017-08-17 20:55:05.534592", 
  "modified_by": "Administrator", 
  "module": "Booking", 
  "name": "class-reservation", 
@@ -28,7 +28,7 @@
  "route": "reservation", 
  "show_sidebar": 0, 
  "sidebar_items": [], 
- "success_message": "Merci pour la r\u00e9servation.\nVous allez recevoir une confirmation par email et/ou SMS.", 
+ "success_message": "Merci pour la r\u00e9servation.\nVous allez recevoir une confirmation par e-mail (et SMS si demand\u00e9).", 
  "success_url": "/accueil", 
  "title": "R\u00e9servation", 
  "web_form_fields": [
@@ -76,17 +76,6 @@
    "reqd": 0
   }, 
   {
-   "description": "", 
-   "fieldname": "confirm_sms", 
-   "fieldtype": "Check", 
-   "hidden": 0, 
-   "label": "Recevoir un SMS de confirmation", 
-   "max_length": 0, 
-   "max_value": 0, 
-   "read_only": 0, 
-   "reqd": 0
-  }, 
-  {
    "fieldtype": "Column Break", 
    "hidden": 0, 
    "max_length": 0, 
@@ -106,9 +95,20 @@
   }, 
   {
    "fieldname": "comment", 
-   "fieldtype": "Text", 
+   "fieldtype": "Small Text", 
    "hidden": 0, 
    "label": "Commentaire", 
+   "max_length": 0, 
+   "max_value": 0, 
+   "read_only": 0, 
+   "reqd": 0
+  }, 
+  {
+   "description": "Une confirmation est syst\u00e9matiquement envoy\u00e9e par e-mail.", 
+   "fieldname": "confirm_sms", 
+   "fieldtype": "Check", 
+   "hidden": 0, 
+   "label": "Recevoir un SMS de confirmation", 
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
