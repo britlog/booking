@@ -90,7 +90,7 @@ class Booking(Document):
                 </div>
                 """
             try:
-                frappe.sendmail(recipients=forward_to_email, sender=email, content=content.format(*messages), subject=_("Nouvelle réservation"))
+                frappe.sendmail(recipients=forward_to_email, sender=email, content=content.format(*messages), subject="Réservation de"+self.full_name)
             except Exception as e:
                 frappe.log_error(frappe.get_traceback(),'email to company failed')  # Otherwise, booking is not registered in database if errors
 
@@ -104,10 +104,6 @@ class Booking(Document):
         # save a document to the database
         doc.save()
 
-        # send notification email if customer ask for warning
-        if doc.available_places == 1 :
-            frappe.throw("RRR")
-
 
     def validate(self):
 
@@ -116,7 +112,8 @@ class Booking(Document):
 
         # raise error
         if doc.available_places <= 0 :
-            frappe.throw("Plus de place à cette séance, veuillez s'il vous plaît rafraîchir votre navigateur")
+            frappe.throw("""Plus de place disponible pour cette séance, vous pouvez néanmoins demander
+            			à être prévenu par e-mail si une place se libère.""")
 
         # check if already registered
         booked = frappe.db.sql("""select COUNT(*)

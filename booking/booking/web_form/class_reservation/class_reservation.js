@@ -5,7 +5,7 @@ frappe.ready(function() {
     // load slots
     $('[name="slot"]').empty()
     $('[name="slot"]').append($('<option>').val('').text(''));
-    $('[name="slot"]').after($('<input class="btn btn-default" type="button" id="notification-button" value="Prévenez-moi lorsqu\'une place se libère">'));
+    $('[name="slot"]').after($('<input class="btn btn-default" type="button" id="notification-button" value="Etre prévenu si une place se libère">'));
     $("#notification-button").prop("disabled",true);
     frappe.call({
         method: 'booking.booking.web_form.class_reservation.class_reservation.get_slot',
@@ -43,7 +43,7 @@ frappe.ready(function() {
 
     $('[name="slot"]').change(function () {
           var str = "";
-          $('#notification-button').prop('value', 'Prévenez-moi lorsqu\'une place se libère');
+          $('#notification-button').prop('value', 'Etre prévenu si une place se libère');
 
           $("select option:selected").each(function () {
                 str += $(this).text() + " ";
