@@ -1,0 +1,30 @@
+<h4 class="text-center">{%= __("Attendance Sheet") %}</h4>
+<h5 class="text-center">{%= filters.slot %}</h5>
+<hr>
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th style="width: 10%">{%= __("Sr No") %}</th>
+            <th style="width: 30%">{%= __("Nom") %}</th>
+			<th style="width: 15%">{%= __("Booking No") %}</th>
+			<th style="width: 15%">{%= __("Remaining Classes") %}</th>
+			<th style="width: 15%">{%= __("End Date") %}</th>
+			<th style="width: 15%">{%= __("Present") %}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for(var i=0, l=data.length; i<l; i++) { %}
+			<tr>
+                <td>{%= i+1 %}</td>
+				<td>{%= data[i][__("Nom")] %}</td>
+				<td>{%= data[i][__("Booking No")] %}</td>
+				<td>{%= data[i][__("Remaining Classes")] %}</td>
+                <td>{%= dateutil.str_to_user(data[i][__("End Date")]) %}</td>
+				<td style="text-align: left">{%= frappe.format(data[i][__("Present")], {fieldtype: "Check"}) %}</td>
+			</tr>
+		{% } %}
+	</tbody>
+</table>
+
+<p class="text-right text-muted">{{ __("Printed On") }} {%= dateutil.str_to_user(dateutil.get_datetime_as_string()) %}</p>
