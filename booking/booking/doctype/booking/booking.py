@@ -56,7 +56,7 @@ class Booking(Document):
         # send SMS notification
         if self.phone and self.confirm_sms:
             receiver_list = [self.phone]
-            message = "Santani Yoga : votre cours de yoga du "+self.slot+" est confirmé. Namasté, Tonya"
+            message = "Santani Yoga : votre cours du "+self.slot+" est confirmé. Namasté, Tonya. Merci de ne pas répondre (robot)."
 
             try:
                 send_sms(receiver_list,message,'',False)
