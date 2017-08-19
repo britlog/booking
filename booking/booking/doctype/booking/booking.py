@@ -7,7 +7,7 @@ import frappe
 from frappe.model.document import Document
 from frappe import throw, _
 from erpnext.setup.doctype.sms_settings.sms_settings import send_sms
-# from frappe.utils.error import make_error_snapshot
+from frappe.utils import now_datetime
 
 class Booking(Document):
 
@@ -111,9 +111,9 @@ class Booking(Document):
         doc = frappe.get_doc("Booking Slot", self.slot)
 
         # raise error
-        if doc.available_places <= 0 :
+        if doc.available_places <= 0 and doc.time_slot > now_datetime() :
             frappe.throw("""Plus de place disponible pour cette séance, vous pouvez néanmoins demander
-            			à être prévenu par e-mail si une place se libère.""")
+                        à être prévenu par e-mail si une place se libère.""")
 
         # check if already registered
         booked = frappe.db.sql("""select COUNT(*)
