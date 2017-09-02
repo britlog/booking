@@ -99,6 +99,7 @@ def send_notification_email(slot):
             slot,
             "Je vous invite à vous inscrire sur la",
             url,
+			"Si le cours est déjà complet, c'est que la place vient d'être réservée et il faut vous réinscrire à l'alerte car cet e-mail n'est envoyé qu'une seule fois.",
             "Namasté"
         )
 
@@ -107,7 +108,8 @@ def send_notification_email(slot):
             <p>{0},<p>
             <p>{1} <strong>{2}</strong>.</p>
             <p>{3} <a href="{4}">page réservation</a>.</p>
-            <p>{5},<br>Tonya</p>
+            <p>{5}</p>
+            <p>{6},<br>Tonya</p>
             </div>
             """
 

@@ -5,7 +5,7 @@ frappe.ready(function() {
     // load slots
     $('[name="slot"]').empty()
     $('[name="slot"]').append($('<option>').val('').text(''));
-    $('[name="slot"]').after($('<input class="btn btn-default" type="button" id="notification-button" value="Etre prévenu si une place se libère">'));
+    $('[name="slot"]').after($('<input class="btn btn-primary" type="button" id="notification-button" value="Etre prévenu par e-mail si une place se libère">'));
     $("#notification-button").prop("disabled",true);
     frappe.call({
         method: 'booking.booking.web_form.class_reservation.class_reservation.get_slot',
@@ -43,7 +43,7 @@ frappe.ready(function() {
 
     $('[name="slot"]').change(function () {
           var str = "";
-          $('#notification-button').prop('value', 'Etre prévenu si une place se libère');
+          $('#notification-button').prop('value', 'Etre prévenu par e-mail si une place se libère');
 
           $("select option:selected").each(function () {
                 str += $(this).text() + " ";
@@ -59,6 +59,7 @@ frappe.ready(function() {
 
     $('#notification-button').on("click", function() {
         var email = $('[name="email_id"]').val();
+        var fullname = $('[name="full_name"]').val();
         var slot = $('[name="slot"]').val();
 
         if (!email || !valid_email(email)) {
@@ -67,11 +68,18 @@ frappe.ready(function() {
             return false;
 		}
 
+		if (!fullname) {
+            frappe.msgprint(__("Entrez s'il vous plaît votre nom."));
+            $('[name="full_name"]').focus();
+            return false;
+		}
+
 		frappe.call({
             method: 'booking.booking.web_form.class_reservation.class_reservation.set_notification',
             args: {
                 'slot': slot,
-                'email': email
+                'email': email,
+                'name': fullname
             },
             callback: function(r) {
                 //console.log(r.message);
