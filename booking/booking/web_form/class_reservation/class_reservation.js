@@ -106,6 +106,8 @@ frappe.ready(function() {
 		}
 
 		if(phone || sms) {
+            phone = phone.replace(/\D/g,"");    // delete all non-numeric characters
+            $('[name="phone"]').val(phone);
             if (!valid_phone(phone,sms)) {
                 frappe.msgprint(__("Entrez s'il vous plaît un numéro de téléphone valide.\
                     Un numéro de portable est nécessaire si vous avez demandé une confirmation par SMS."));

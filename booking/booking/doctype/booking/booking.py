@@ -53,6 +53,22 @@ class Booking(Document):
             except Exception as e:
                 frappe.log_error(frappe.get_traceback(), 'email failed')    # Otherwise, booking is not registered in database if errors
 
+            # add email to the main newsletter
+            parsed_email = frappe.utils.validate_email_add(email, False)
+            email_group = _("Website")
+
+            if parsed_email:
+                if not frappe.db.get_value("Email Group Member",
+                                           {"email_group": email_group, "email": parsed_email}):
+                    frappe.get_doc({
+                        "doctype": "Email Group Member",
+                        "email_group": email_group,
+                        "email": parsed_email
+                    }).insert(ignore_permissions=frappe.flags.ignore_permissions)
+
+                frappe.get_doc("Email Group", email_group).update_total_subscribers()
+                frappe.db.commit()
+
         # send SMS notification
         if self.phone and self.confirm_sms:
             receiver_list = [self.phone]
@@ -67,26 +83,21 @@ class Booking(Document):
         forward_to_email = frappe.db.get_value("Contact Us Settings", None, "forward_to_email")
         if forward_to_email:
             messages = (
-                _("Bonjour"),
-                _("J'ai le plaisir de vous informer de la réservation n°"),
+                _("Nouvelle réservation n°"),
                 self.name,
                 _("pour le"),
                 self.slot,
                 _("Nom"),
                 self.full_name,
                 _("Commentaire"),
-                self.comment,
-                url
+                self.comment
             )
 
             content = """
                 <div style="font-family: verdana; font-size: 16px;">
-                <p>{0},<p>
-                <p>{1} {2} {3}</p>
-                <p><strong>{4}</strong></p>
-                <p>{5} : {6}</p>
-                <p>{7} : {8}</p>
-                <img alt="Santani Yoga" src="{9}">
+                <p>{0} {1} {2} <strong>{3}</strong>.</p>
+                <p>{4} : {5}</p>
+                <p>{6} : {7}</p>
                 </div>
                 """
             try:
