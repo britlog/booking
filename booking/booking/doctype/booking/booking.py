@@ -64,7 +64,7 @@ class Booking(Document):
                         "doctype": "Email Group Member",
                         "email_group": email_group,
                         "email": parsed_email
-                    }).insert(ignore_permissions=frappe.flags.ignore_permissions)
+                    }).insert(ignore_permissions=True)
 
                 frappe.get_doc("Email Group", email_group).update_total_subscribers()
                 frappe.db.commit()
