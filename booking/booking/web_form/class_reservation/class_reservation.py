@@ -29,9 +29,28 @@ def get_slot():
 @frappe.whitelist(allow_guest=True)
 def set_notification(slot, email, name):
 	doc = frappe.get_doc("Booking Slot", slot)
-	doc.append("notifications", {
-		"email_id": email,
-		"full_name": name,
-		"request_date": datetime.datetime.now()
-	})
-	doc.save()
+
+	# check if already registered
+	booked = frappe.db.sql("""select COUNT(*)
+	                from `tabBooking`
+	                where `tabBooking`.slot = %(slot)s and `tabBooking`.email_id = %(email)s""",
+						   {"slot": slot, "email": email})[0][0]
+
+	booked += frappe.db.sql("""select COUNT(*)
+	                from `tabBooking Subscriber`
+	                inner join `tabCustomer` on `tabBooking Subscriber`.subscriber = tabCustomer.name
+	                inner join `tabDynamic Link` on tabCustomer.name=`tabDynamic Link`.link_name
+	                inner join `tabContact` on `tabDynamic Link`.parent=tabContact.name
+	                where `tabBooking Subscriber`.parent = %(slot)s and `tabContact`.email_id = %(email)s""",
+							{"slot": slot, "email": email})[0][0]
+
+	# raise error
+	if booked > 0:
+		frappe.throw("Vous êtes déjà inscrit à cette séance")
+	else:
+		doc.append("notifications", {
+			"email_id": email,
+			"full_name": name,
+			"request_date": datetime.datetime.now()
+		})
+		doc.save()
