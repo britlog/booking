@@ -6,22 +6,24 @@
 	<thead>
 		<tr>
 			<th style="width: 05%"></th>
-            <th style="width: 35%">{%= __("Name") %}</th>
-			<th style="width: 20%">{%= __("Booking No") %}</th>
-			<th style="width: 20%">{%= __("Remaining Classes") %}</th>
+            <th style="width: 30%">{%= __("Name") %}</th>
+			<th style="width: 10%">{%= __("Booking No") %}</th>
+			<th style="width: 10%">{%= __("Remaining Classes") %}</th>
 			<th style="width: 15%">{%= __("End Date") %}</th>
-			<th style="width: 05%">{%= __("Present") %}</th>
+            <th style="width: 20%">{%= __("Cancellation Date") %}</th>
+			<th style="width: 10%">{%= __("Present") %}</th>
 		</tr>
 	</thead>
 	<tbody>
 		{% for(var i=0, l=data.length; i<l; i++) { %}
 			<tr>
-                <td style="height: 50px;">{%= i+1 %}</td>
-				<td style="height: 50px;">{%= data[i][__("Nom")] %}</td>
-				<td style="height: 50px;">{%= data[i][__("Booking No")] %}</td>
-				<td style="height: 50px;">{%= data[i][__("Remaining Classes")] %}</td>
-                <td style="height: 50px;">{%= dateutil.str_to_user(data[i][__("End Date")]) %}</td>
-				<td style="height: 50px;text-align: center;">{%= frappe.format(data[i][__("Present")], {fieldtype: "Check"}) %}</td>
+                <td style="height: 40px;">{%= i+1 %}</td>
+				<td style="height: 40px;">{%= data[i][__("Nom")] %}</td>
+				<td style="height: 40px;">{%= data[i][__("Booking No")] %}</td>
+				<td style="height: 40px;">{%= data[i][__("Remaining Classes")] %}</td>
+                <td style="height: 40px;">{%= dateutil.str_to_user(data[i][__("End Date")]) %}</td>
+                <td style="height: 40px;">{%= dateutil.str_to_user(data[i][__("Cancellation Date")]) %}</td>
+				<td style="height: 40px;text-align: center;">{%= frappe.format(data[i][__("Present")], {fieldtype: "Check"}) %}</td>
 			</tr>
 		{% } %}
 	</tbody>

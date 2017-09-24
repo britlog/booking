@@ -10,8 +10,8 @@ frappe.query_reports["Attendance Sheet"] = {
             "options": "Booking Slot",
             "reqd": 1,
             "get_query": function() {
-                console.log(frappe.datetime.get_today());
-				return{
+//                console.log(frappe.datetime.get_today());
+				return {
 					filters: {
 						'time_slot': [">=", frappe.datetime.get_today()]
 					}
