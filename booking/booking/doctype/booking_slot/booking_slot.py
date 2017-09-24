@@ -23,8 +23,10 @@ class BookingSlot(Document):
 @frappe.whitelist()
 def refresh_available_places(slot,total_places,nb_subscribers):
 
-    return str( int(total_places) - frappe.db.count("Booking",{"slot": ["=", slot]})
-        # - frappe.db.count("Booking Subscriber", {"parent": ["=", slot]})
+    return str( int(total_places)
+		  # - frappe.db.count("Booking",{"slot": ["=", slot], "cancellation_date": ""})
+          - frappe.db.sql("""select COUNT(*) from `tabBooking` where slot = %(slot)s and cancellation_date is null""",
+						{"slot": slot})[0][0]
           - int(nb_subscribers)
     )
 
@@ -99,7 +101,7 @@ def send_notification_email(slot):
             slot,
             "Je vous invite à vous inscrire sur la",
             url,
-			"Si le cours est déjà complet, c'est que la place vient d'être réservée et il faut vous réinscrire à l'alerte car cet e-mail n'est envoyé qu'une seule fois.",
+            "Si le cours est déjà complet, c'est que la place vient d'être réservée et il faut vous réinscrire à l'alerte car cet e-mail n'est envoyé qu'une seule fois.",
             "Namasté"
         )
 
@@ -122,6 +124,6 @@ def send_notification_email(slot):
                                  'email failed')  # Otherwise, booking is not registered in database if errors
 
             frappe.db.sql("""
-				update `tabBooking Notification` set sending_date = NOW()
-				where parent = %(parent)s and email_id = %(email)s and sending_date is null """,
-				{"parent": slot,"email":fields.email_id})
+                update `tabBooking Notification` set sending_date = NOW()
+                where parent = %(parent)s and email_id = %(email)s and sending_date is null """,
+                {"parent": slot,"email":fields.email_id})

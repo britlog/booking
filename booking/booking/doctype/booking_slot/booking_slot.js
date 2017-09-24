@@ -24,13 +24,21 @@ frappe.ui.form.on('Booking Slot', {
 
 frappe.ui.form.on('Booking Slot', "total_places", function(frm) {
     var tbl = frm.doc.subscribers || [];
+    var nb_subscribers = 0;
+
+    //calculate nb_subscribers
+    $.each(tbl || [], function(i, subscriber) {
+		if (!subscriber.cancellation_date) {
+		    nb_subscribers += 1;
+		}
+	});
 
     frappe.call({
             method: "booking.booking.doctype.booking_slot.booking_slot.refresh_available_places",
             args: {
                 "slot": frm.doc.name,
                 "total_places": frm.doc.total_places,
-                "nb_subscribers": tbl.length
+                "nb_subscribers": nb_subscribers //tbl.length
             },
             callback: function(r) {
                 //frappe.msgprint(r.message);
@@ -43,20 +51,21 @@ frappe.ui.form.on('Booking Slot', "total_places", function(frm) {
 
 frappe.ui.form.on('Booking Subscriber', {
     subscribers_remove: function(frm) {
-        frm.doc.available_places += 1;
-        refresh_field("available_places");
+//		frm.doc.available_places += 1;
+//		refresh_field("available_places");
+        frm.trigger("total_places");
         CustomerClassesUpdate = true;
-
     },
     subscribers_add: function(frm) {
-        frm.doc.available_places -= 1;
-        refresh_field("available_places");
+//        frm.doc.available_places -= 1;
+//        refresh_field("available_places");
+        frm.trigger("total_places");
         CustomerClassesUpdate = true;
     }
 });
 
 frappe.ui.form.on("Booking Subscriber", "present", function(frm,cdt,cdn) {
-    CustomerClassesUpdate = true;
+    CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
 //    var customer = frappe.get_doc(cdt, cdn);
 //    frappe.msgprint(customer.subscriber);
 //
@@ -70,4 +79,8 @@ frappe.ui.form.on("Booking Subscriber", "present", function(frm,cdt,cdn) {
 //            }
 //    });
 
+});
+
+frappe.ui.form.on("Booking Subscriber", "cancellation_date", function(frm,cdt,cdn) {
+    frm.trigger("total_places");
 });
