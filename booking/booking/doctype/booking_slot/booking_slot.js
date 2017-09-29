@@ -84,3 +84,7 @@ frappe.ui.form.on("Booking Subscriber", "present", function(frm,cdt,cdn) {
 frappe.ui.form.on("Booking Subscriber", "cancellation_date", function(frm,cdt,cdn) {
     frm.trigger("total_places");
 });
+
+frappe.ui.form.on('Booking Slot', "time_slot", function(frm) {
+    frm.trigger("total_places");    // force calculation in case of duplicate time_slot
+});

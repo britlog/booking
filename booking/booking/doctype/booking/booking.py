@@ -55,7 +55,7 @@ class Booking(Document):
 
 			# add email to the main newsletter
 			parsed_email = frappe.utils.validate_email_add(email, False)
-			email_group = _("Website")
+			email_group = _("Website", lang='fr')
 
 			if parsed_email:
 				if not frappe.db.get_value("Email Group Member",
@@ -119,13 +119,13 @@ class Booking(Document):
 	def on_update(self):
 		update_available_places(self.slot)
 
-	def validate(self):
+	def before_insert(self):
 
 		# check available places before saving
 		doc = frappe.get_doc("Booking Slot", self.slot)
 
 		# raise error
-		if doc.available_places <= 0 and doc.time_slot > now_datetime() :
+		if doc.available_places <= 0:
 			frappe.throw("""Plus de place disponible pour cette séance, vous pouvez néanmoins demander
 						à être prévenu par e-mail si une place se libère.""")
 

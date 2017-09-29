@@ -10,23 +10,24 @@ from frappe.model.document import Document
 class BookingSlot(Document):
 
     def autoname(self):
-
         self.name = frappe.utils.format_datetime(self.time_slot,"EEEE dd/MM/yyyy HH:mm").capitalize()
 
     def on_update(self):
-
         # send notification email if customer ask for warning
-        if int(self.available_places) > 0:
+        in_progress = False
+        if int(self.available_places) > 0 and not in_progress:
+            in_progress = True
             send_notification_email(self.name)
+            in_progress = False
 
 
 @frappe.whitelist()
 def refresh_available_places(slot,total_places,nb_subscribers):
 
     return str( int(total_places)
-		  # - frappe.db.count("Booking",{"slot": ["=", slot], "cancellation_date": ""})
+          # - frappe.db.count("Booking",{"slot": ["=", slot], "cancellation_date": ""})
           - frappe.db.sql("""select COUNT(*) from `tabBooking` where slot = %(slot)s and cancellation_date is null""",
-						{"slot": slot})[0][0]
+                        {"slot": slot})[0][0]
           - int(nb_subscribers)
     )
 
@@ -88,9 +89,10 @@ def get_remaining_classes(customer_id,total_classes,start_date):
 def send_notification_email(slot):
     # get all notifications of this slot
     notifications = frappe.db.sql("""
-        select distinct email_id
-        from `tabBooking Notification`
-        where parent = %(parent)s and sending_date is null """,
+        select distinct BN.email_id
+        from `tabBooking Notification` BN
+        inner join `tabBooking Slot` BS on BN.parent = BS.name
+        where BS.time_slot > NOW() and BN.parent = %(parent)s and BN.sending_date is null """,
         {"parent": slot},as_dict=True)
 
     if notifications:
@@ -120,8 +122,7 @@ def send_notification_email(slot):
             try:
                 frappe.sendmail(fields.email_id, subject="Cours de yoga du "+slot, content=content.format(*messages))
             except Exception as e:
-                frappe.log_error(frappe.get_traceback(),
-                                 'email failed')  # Otherwise, booking is not registered in database if errors
+                frappe.log_error(frappe.get_traceback(), 'email failed')
 
             frappe.db.sql("""
                 update `tabBooking Notification` set sending_date = NOW()
