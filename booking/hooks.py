@@ -90,6 +90,11 @@ doctype_js = {
 # Scheduled Tasks
 # ---------------
 
+scheduler_events = {
+	"hourly": [
+		"booking.booking.doctype.booking_slot.booking_slot.send_notification_email"
+	]
+}
 # scheduler_events = {
 # 	"all": [
 # 		"booking.tasks.all"
