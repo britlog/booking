@@ -34,6 +34,10 @@ frappe.ready(function() {
         }
     });
 
+    function valid_email_fr(id) {
+	    return (id.toLowerCase().search("^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$")==-1) ? 0 : 1;
+    }
+
     function valid_phone(id,mobile) {
     if (mobile)
         return (id.search("^0[6-7][0-9]{8}$")==-1) ? 0 : 1;
@@ -62,8 +66,8 @@ frappe.ready(function() {
         var fullname = $('[name="full_name"]').val();
         var slot = $('[name="slot"]').val();
 
-        if (!email || !valid_email(email)) {
-            frappe.msgprint(__("Entrez s'il vous plaît une adresse e-mail valide."));
+        if (!email || !valid_email_fr(email)) {
+            frappe.msgprint(__("Entrez s'il vous plaît une adresse e-mail valide, sans accents ni espaces."));
             $('[name="email_id"]').focus();
             return false;
 		}
@@ -99,8 +103,8 @@ frappe.ready(function() {
 		var phone = $('[name="phone"]').val();
 		var sms = $('[name="confirm_sms"]').is(':checked');
 
-		if(email && !valid_email(email)) {
-            frappe.msgprint(__("Entrez s'il vous plaît une adresse e-mail valide."));
+		if(email && !valid_email_fr(email)) {
+            frappe.msgprint(__("Entrez s'il vous plaît une adresse e-mail valide, sans accents ni espaces."));
             $('[name="email_id"]').focus();
             return false;
 		}
