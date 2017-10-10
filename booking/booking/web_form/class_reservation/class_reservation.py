@@ -22,7 +22,6 @@ def get_slot():
 	return frappe.get_all("Booking Slot",
 		fields=["name", "type","available_places"],
 		filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
-				 ["Booking Slot", "available_places", ">=", 0],
 				 ["Booking Slot", "show_in_website", "=", 1]],
 		order_by="time_slot asc")
 

@@ -17,7 +17,7 @@ frappe.ready(function() {
             var options = [];
             var available_message = "";
             (r.message || []).forEach(function(row){
-                if (row.available_places == 0) {
+                if (row.available_places <= 0) {
                     available_message = "Complet";
                 }
                 else if (row.available_places == 1) {
