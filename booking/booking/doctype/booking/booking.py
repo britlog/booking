@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe import throw, _
-from erpnext.setup.doctype.sms_settings.sms_settings import send_sms
+from frappe.core.doctype.sms_settings.sms_settings import send_sms
 from frappe.utils import now_datetime
 
 class Booking(Document):
