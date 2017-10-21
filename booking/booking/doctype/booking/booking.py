@@ -121,20 +121,11 @@ class Booking(Document):
 
 	def before_insert(self):
 
-		# check available places before saving
-		doc = frappe.get_doc("Booking Slot", self.slot)
-
-		# raise error
-		if doc.available_places <= 0:
-			frappe.throw("""Plus de place disponible pour cette séance, vous pouvez néanmoins demander
-						à être prévenu par e-mail si une place se libère.""")
-
 		# check if already registered
 		booked = frappe.db.sql("""select COUNT(*)
 				 from `tabBooking`
-				 where `tabBooking`.slot = %(slot)s and `tabBooking`.email_id = %(email)s
-				 and `tabBooking`.name <> %(name)s""",
-				 {"slot": self.slot, "email": self.email_id, "name": self.name})[0][0]
+				 where `tabBooking`.slot = %(slot)s and `tabBooking`.email_id = %(email)s""",
+				 {"slot": self.slot, "email": self.email_id})[0][0]
 
 		booked += frappe.db.sql("""select COUNT(*)
 				 from `tabBooking Subscriber`
@@ -147,6 +138,14 @@ class Booking(Document):
 		# raise error
 		if booked > 0 :
 			frappe.throw("Vous êtes déjà inscrit à cette séance")
+
+		# check available places before saving
+		doc = frappe.get_doc("Booking Slot", self.slot)
+
+		# raise error
+		if doc.available_places <= 0:
+			frappe.throw("""Plus de place disponible pour cette séance, vous pouvez néanmoins demander
+						à être prévenu par e-mail si une place se libère.""")
 
 
 def update_available_places(slot):
