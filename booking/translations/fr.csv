@@ -15,3 +15,7 @@ TODO,Request Date,Date de Demande
 TODO,Sending Date,Date d'Envoi
 TODO,Subscription,Abonnement
 TODO,Cancellation Date,Date d'Annulation
+TODO,Booking Type,Type de Réservation
+TODO,Default Places,Places par Défaut
+TODO,Allow Trial Class,Autoriser un Cours d'Essai
+TODO,The first booking will be marked as Trial,La première réservation sera marquée comme Essai
