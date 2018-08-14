@@ -20,6 +20,7 @@ def get_columns(filters):
 	columns = [
 		_("Name") + "::200",
 		_("Booking No") + "::100",
+		_("Trial Class") + ":Check:100",
 		_("Remaining Classes") + "::100",
 		_("End Date")+ ":Date:100",
 		_("Cancellation Date") + ":Date:100",
@@ -28,7 +29,7 @@ def get_columns(filters):
 	return columns
 
 def get_subscribers(slot):
-	subscribers =  frappe.db.sql("""select C.customer_name, 'Abonné', C.subscription_remaining_classes,
+	subscribers =  frappe.db.sql("""select C.customer_name, 'Abonné', '', C.subscription_remaining_classes,
 			C.subscription_end_date, BS.cancellation_date, BS.present
 		from `tabBooking Subscriber` BS
 		inner join tabCustomer C on BS.subscriber=C.name
@@ -36,6 +37,6 @@ def get_subscribers(slot):
 	return subscribers
 
 def get_bookings(slot):
-	customers =  frappe.db.sql("""select full_name, name, '', '', cancellation_date, present from `tabBooking`
+	customers =  frappe.db.sql("""select full_name, name, trial_class, '', '', cancellation_date, present from `tabBooking`
 		where slot=%s order by full_name""", slot, as_dict=0)
 	return customers

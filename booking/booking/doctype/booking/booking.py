@@ -147,6 +147,10 @@ class Booking(Document):
 			frappe.throw("""Plus de place disponible pour cette séance, vous pouvez néanmoins demander
 						à être prévenu par e-mail si une place se libère.""")
 
+		# manage trial class
+		if frappe.get_value("Booking Type",doc.type,'allow_trial_class'):
+			self.trial_class = is_trial_class(self.email_id)
+
 
 def update_available_places(slot):
 	doc = frappe.get_doc("Booking Slot", slot)
@@ -158,3 +162,10 @@ def update_available_places(slot):
 		{"slot": slot})[0][0]
 
 	doc.save()
+
+
+def is_trial_class(email):
+	booking_nb = frappe.db.sql("""select COUNT(*) from `tabBooking` where email_id = %(email)s""",
+		{"email": email})[0][0]
+
+	return True if booking_nb <= 0 else False
