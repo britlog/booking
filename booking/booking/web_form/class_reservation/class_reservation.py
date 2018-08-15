@@ -19,11 +19,19 @@ def get_stock(slot):
 
 @frappe.whitelist(allow_guest=True)
 def get_slot():
-	return frappe.get_all("Booking Slot",
-		fields=["name", "type","available_places"],
+
+	slots = frappe.get_all("Booking Slot",
+		fields=["name", "type","available_places","total_places"],
 		filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
 				 ["Booking Slot", "show_in_website", "=", 1]],
 		order_by="time_slot asc")
+
+	for slot in slots:
+		slot['subscription_places'] = slot.get('total_places') \
+			- frappe.db.sql("""select COUNT(*) from `tabBooking Subscriber` where parent = %(slot)s""",
+			{"slot": slot.get('name')})[0][0]
+
+	return slots
 
 @frappe.whitelist(allow_guest=True)
 def set_notification(slot, email, name):

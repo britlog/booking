@@ -5,8 +5,10 @@ frappe.ready(function() {
     // load slots
     $('[name="slot"]').empty()
     $('[name="slot"]').append($('<option>').val('').text(''));
-    $('[name="slot"]').after($('<input class="btn btn-primary" type="button" id="notification-button" value="Etre prévenu par e-mail si une place se libère">'));
-    $("#notification-button").prop("disabled",true);
+    $('[name="slot"]').after($('<input class="btn btn-primary" type="button" id="notification-button" value="Recevoir un mail si une place se libère">'));
+    //$("#notification-button").prop("disabled",true);
+    $("#notification-button").toggle(false);	//hide button
+
     frappe.call({
         method: 'booking.booking.web_form.class_reservation.class_reservation.get_slot',
         args: {
@@ -18,7 +20,7 @@ frappe.ready(function() {
             var available_message = "";
             (r.message || []).forEach(function(row){
                 if (row.available_places <= 0) {
-                    available_message = "Complet";
+                    available_message = "Liste d'attente";
                 }
                 else if (row.available_places == 1) {
                     available_message = "1 place disponible";
@@ -26,7 +28,8 @@ frappe.ready(function() {
                 else {
                     available_message = row.available_places+" places disponibles";
                 }
-                $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" | "+row.type.toUpperCase()+" | "+available_message));
+                $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" | "+row.type.toUpperCase()+" | "+available_message)
+                .attr('available_places',row.available_places).attr('subscription_places',row.subscription_places));
 
 //                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
             });
@@ -46,19 +49,22 @@ frappe.ready(function() {
     }
 
     $('[name="slot"]').change(function () {
-          var str = "";
-          $('#notification-button').prop('value', 'Etre prévenu par e-mail si une place se libère');
 
-          $("select option:selected").each(function () {
-                str += $(this).text() + " ";
-              });
+          $('#notification-button').prop('value', 'Recevoir un mail si une place se libère');
+          $("#notification-button").prop("disabled",false);
 
-          if (str.search("Complet") != -1) {
-            $("#notification-button").prop("disabled",false);
+          if ($("select option:selected").attr('available_places') <= 0) {
+            $("#notification-button").toggle(true);		//show button
           }
           else {
-            $("#notification-button").prop("disabled",true);
+            $("#notification-button").toggle(false);	//hide button
           }
+
+		  if ($("select option:selected").attr('subscription_places') <= 0) {
+		  	frappe.msgprint("Le groupe est complet, cours à la séance uniquement.");
+		  }
+
+
      })
 
     $('#notification-button').on("click", function() {
