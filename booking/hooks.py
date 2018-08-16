@@ -92,7 +92,7 @@ doctype_js = {
 
 scheduler_events = {
 	"hourly": [
-		"booking.booking.doctype.booking_slot.booking_slot.send_notification_email"
+		"booking.booking.doctype.booking_notification.booking_notification.send_notification_email"
 	]
 }
 # scheduler_events = {

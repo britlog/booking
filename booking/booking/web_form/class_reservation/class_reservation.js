@@ -5,7 +5,7 @@ frappe.ready(function() {
     // load slots
     $('[name="slot"]').empty()
     $('[name="slot"]').append($('<option>').val('').text(''));
-    $('[name="slot"]').after($('<input class="btn btn-primary" type="button" id="notification-button" value="Recevoir un mail si une place se libère">'));
+    $('[name="slot"]').after($('<input class="btn btn-primary" type="button" id="notification-button" value="S\'inscrire sur la liste d\'attente">'));
     //$("#notification-button").prop("disabled",true);
     $("#notification-button").toggle(false);	//hide button
 
@@ -50,7 +50,6 @@ frappe.ready(function() {
 
     $('[name="slot"]').change(function () {
 
-          $('#notification-button').prop('value', 'Recevoir un mail si une place se libère');
           $("#notification-button").prop("disabled",false);
 
           if ($("select option:selected").attr('available_places') <= 0) {
@@ -93,7 +92,8 @@ frappe.ready(function() {
             },
             callback: function(r) {
                 //console.log(r.message);
-                $('#notification-button').prop('value', 'Demande de notification enregistrée');
+                frappe.msgprint(__("Votre demande d'inscription sur la liste d'attente est bien enregistrée.\
+                	Vous allez recevoir un e-mail si une place se libère."));
                 $("#notification-button").prop("disabled",true);
             }
         });
