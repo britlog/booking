@@ -72,7 +72,10 @@ class Booking(Document):
 		# send SMS notification
 		if self.phone and self.confirm_sms:
 			receiver_list = [self.phone]
-			message = "Santani Yoga : votre cours du "+self.slot+" est confirmé. Namasté, Tonya. Merci de ne pas répondre (message automatique)."
+
+			sms_template = frappe.db.get_single_value('Booking Settings', 'booking_sms')
+			args = frappe.get_doc('Booking Slot', self.slot).as_dict()
+			message = frappe.render_template(sms_template, args)
 
 			try:
 				send_sms(receiver_list,message,'',False)
