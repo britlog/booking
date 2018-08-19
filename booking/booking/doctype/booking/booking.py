@@ -165,7 +165,10 @@ def update_available_places(slot):
 
 
 def is_trial_class(email):
-	booking_nb = frappe.db.sql("""select COUNT(*) from `tabBooking` where email_id = %(email)s""",
+	booking_nb = frappe.db.sql("""select COUNT(*) from `tabBooking` B 
+		inner join `tabBooking Slot` BS on B.slot = BS.name
+		inner join  `tabBooking Type` BT on BS.type = BT.name
+		where B.email_id = %(email)s and BT.allow_trial_class = 1""",
 		{"email": email})[0][0]
 
 	return True if booking_nb <= 0 else False
