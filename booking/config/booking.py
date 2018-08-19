@@ -9,13 +9,13 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
-					"name": "Booking Slot",
-					"description": _("Booking Slots."),
+					"name": "Booking",
+					"description": _("Web Bookings."),
 				},
 				{
 					"type": "doctype",
-					"name": "Booking",
-					"description": _("Web Bookings."),
+					"name": "Booking Slot",
+					"description": _("Booking Slots."),
 				},
 			]
 		},

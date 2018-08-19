@@ -144,8 +144,8 @@ class Booking(Document):
 
 		# raise error
 		if doc.available_places <= 0:
-			frappe.throw("""Plus de place disponible pour cette séance, vous pouvez néanmoins demander
-						à être prévenu par e-mail si une place se libère.""")
+			frappe.throw("""Plus de place disponible pour cette séance, vous pouvez néanmoins
+						vous inscrire sur la liste d'attente pour recevoir un mail si une place se libère.""")
 
 		# manage trial class
 		if frappe.get_value("Booking Type",doc.type,'allow_trial_class'):

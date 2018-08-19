@@ -55,9 +55,19 @@ def set_notification(slot, email, name):
 	if booked > 0:
 		frappe.throw("Vous êtes déjà inscrit à cette séance")
 	else:
-		doc.append("notifications", {
-			"email_id": email,
-			"full_name": name,
-			"request_date": datetime.datetime.now()
-		})
-		doc.save()
+
+		# check if already on waiting list
+		waiting_list = frappe.db.sql("""select COUNT(*)
+			                from `tabBooking Notification`
+			                where parent = %(slot)s and email_id = %(email)s""",
+					  {"slot": slot, "email": email})[0][0]
+
+		if waiting_list > 0:
+			frappe.throw("Vous êtes déjà inscrit sur la liste d'attente de cette séance")
+		else:
+			doc.append("notifications", {
+				"email_id": email,
+				"full_name": name,
+				"request_date": datetime.datetime.now()
+			})
+			doc.save()
