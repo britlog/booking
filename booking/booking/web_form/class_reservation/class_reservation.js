@@ -2,6 +2,17 @@
 frappe.ready(function() {
 	// bind events here
 
+	// load introduction text
+	frappe.call({
+        method: 'booking.booking.web_form.class_reservation.class_reservation.get_introduction',
+        args: {},
+        callback: function(r) {
+            if (r.message){
+                $('.introduction p').html(r.message);
+            };
+        }
+    });
+
     // load slots
     $('[name="slot"]').empty()
     $('[name="slot"]').append($('<option>').val('').text(''));

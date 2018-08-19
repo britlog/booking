@@ -18,6 +18,10 @@ def get_stock(slot):
 	return str(stock.available_places)
 
 @frappe.whitelist(allow_guest=True)
+def get_introduction():
+	return frappe.db.get_single_value('Booking Settings', 'booking_form_introduction')
+
+@frappe.whitelist(allow_guest=True)
 def get_slot():
 
 	slots = frappe.get_all("Booking Slot",
