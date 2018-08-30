@@ -2,35 +2,36 @@ import frappe
 from frappe import _
 
 @frappe.whitelist(allow_guest=True)
-def get_solde(email_id):
+def get_subscriptions(email_id):
 
     return frappe.db.sql("""
     select
-        IFNULL(tabCustomer.subscription_remaining_classes,0) AS classes,
-        DATE_FORMAT(tabCustomer.subscription_end_date,%(str)s) AS validity,
-        IFNULL(tabCustomer.subscription_total_classes,0) AS total_classes
-    from `tabCustomer`
-    inner join `tabDynamic Link` on tabCustomer.name=`tabDynamic Link`.link_name
-    inner join `tabContact` on `tabDynamic Link`.parent=tabContact.name
-    where tabContact.email_id = %(email)s""",
+        BSU.name,
+        BSU.reference,
+        BSU.subscribed_classes AS subscribed_classes,
+        BSU.remaining_classes AS remaining_classes,
+        DATE_FORMAT(BSU.start_date,%(str)s) AS start_date,
+        DATE_FORMAT(BSU.end_date,%(str)s) AS end_date
+    from `tabBooking Subscription` BSU
+    inner join `tabCustomer` C on BSU.customer = C.name
+    inner join `tabDynamic Link` DL on C.name = DL.link_name
+    inner join `tabContact` CT on DL.parent = CT.name
+    where CT.email_id = %(email)s and BSU.disabled = 0""",
     {"str": '%d-%m-%Y', "email": email_id},as_dict=True)
 
 @frappe.whitelist(allow_guest=True)
-def get_classes(email_id):
+def get_classes(subscription_id):
 
     return frappe.db.sql("""
     select
-        `tabBooking Slot`.name AS cours,
-        `tabBooking Slot`.type AS style,
-        `tabBooking Subscriber`.present
-    from `tabCustomer`
-    inner join `tabDynamic Link` on tabCustomer.name=`tabDynamic Link`.link_name
-    inner join `tabContact` on `tabDynamic Link`.parent=tabContact.name
-    inner join `tabBooking Subscriber` on tabCustomer.name=`tabBooking Subscriber`.subscriber
-    inner join `tabBooking Slot` on `tabBooking Subscriber`.parent=`tabBooking Slot`.name
-    where tabContact.email_id = %(email)s and CAST(`tabBooking Slot`.time_slot AS DATE)>=tabCustomer.subscription_start_date
-    order by `tabBooking Slot`.time_slot desc""",
-    {"email": email_id},as_dict=True)
+        BS.name AS slot,
+        BS.type AS style,
+        SUB.present
+    from `tabBooking Slot` BS   
+    inner join `tabBooking Subscriber` SUB on BS.name=SUB.parent
+    where SUB.subscription = %(subscription)s
+    order by BS.time_slot desc""",
+    {"subscription": subscription_id},as_dict=True)
 
 
 @frappe.whitelist(allow_guest=True)

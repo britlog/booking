@@ -83,9 +83,9 @@ app_license = "GNU General Public License"
 #      }
 # }
 
-doctype_js = {
-    "Customer": ["booking/custom_scripts/customer.js"]
-}
+# doctype_js = {
+#     "Customer": ["booking/custom_scripts/customer.js"]
+# }
 
 # Scheduled Tasks
 # ---------------

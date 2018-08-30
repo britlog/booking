@@ -1,7 +1,7 @@
 TODO,Attendance Sheet,Feuille de Présence
 TODO,Booking No,N° Réservation
 TODO,Remaining Classes,Cours Restants
-TODO,Total Classes,Cours Souscrits
+TODO,Subscribed Classes,Cours Souscrits
 TODO,Time Slot,Créneau Horaire
 TODO,Booking,Réservation
 TODO,Booking Slot,Créneau de Réservation
@@ -27,3 +27,6 @@ TODO,Bookings,Réservations
 TODO,Waiting List,Liste d'Attente
 TODO,Booking Form Introduction,Introduction du Formulaire de Réservation
 TODO,Booking SMS,SMS de Réservation
+TODO,Booking Subscription,Abonnement
+TODO,Reference,Référence
+TODO,Pick a subscription,Choisissez un abonnement

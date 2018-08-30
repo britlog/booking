@@ -29,11 +29,12 @@ def get_columns(filters):
 	return columns
 
 def get_subscribers(slot):
-	subscribers =  frappe.db.sql("""select C.customer_name, 'Abonné', '', C.subscription_remaining_classes,
-			C.subscription_end_date, BS.cancellation_date, BS.present
+	subscribers =  frappe.db.sql("""select C.customer_name, 'Abonné', '', SUB.remaining_classes,
+			SUB.end_date, BS.cancellation_date, BS.present
 		from `tabBooking Subscriber` BS
-		inner join tabCustomer C on BS.subscriber=C.name
-		where BS.parent=%s order by BS.subscriber""", slot, as_dict=0)
+		inner join tabCustomer C on BS.subscriber = C.name
+		inner join `tabBooking Subscription` SUB on BS.subscription = SUB.name
+		where BS.parent = %s order by BS.subscriber""", slot, as_dict=0)
 	return subscribers
 
 def get_bookings(slot):

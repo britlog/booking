@@ -24,6 +24,13 @@
 
 <div class="row">
 	<div class="col-sm-6">
+		<select id="subscriptions" class="form-control required" style="display: none;">
+		</select>
+	</div>
+</div>
+<br>
+<div class="row">
+	<div class="col-sm-6">
 		<table id="matable" style="width:100%;display: none;">
 		</table>
 	</div>
@@ -34,7 +41,7 @@ var msgprint = function(txt) {
 	if(txt) $("#contact-alert").html(txt).toggle(true);
 }
 </script>
-<script type="text/javascript" src="solde-cours.js"></script>
+<!--<script type="text/javascript" src="solde-cours.js"></script>-->
 
 {% endblock %}
 

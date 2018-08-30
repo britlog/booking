@@ -8,7 +8,7 @@ frappe.ui.form.on('Booking Slot', {
         if (CustomerClassesUpdate) {
             //frappe.msgprint("REFRESH");
             frappe.call({
-                method: "booking.booking.doctype.booking_slot.booking_slot.update_customers",
+                method: "booking.booking.doctype.booking_slot.booking_slot.update_subscriptions",
                 args: {
                     "slot": frm.doc.name
                 },
@@ -87,4 +87,19 @@ frappe.ui.form.on("Booking Subscriber", "cancellation_date", function(frm,cdt,cd
 
 frappe.ui.form.on('Booking Slot', "time_slot", function(frm) {
     frm.trigger("total_places");    // force calculation in case of duplicate time_slot
+});
+
+// Filter subscriptions in child table
+frappe.ui.form.on("Booking Slot", "onload", function(frm, cdt, cdn) {
+
+		frm.set_query("subscription", "subscribers", function(doc, cdt, cdn) {
+			var row = locals[cdt][cdn];
+
+			return {
+				filters: {
+                	"customer": row.subscriber,
+                	"disabled": 0
+            	}
+			};
+		});
 });

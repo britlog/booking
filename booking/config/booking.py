@@ -17,6 +17,11 @@ def get_data():
 					"name": "Booking Slot",
 					"description": _("Booking Slots."),
 				},
+				{
+					"type": "doctype",
+					"name": "Booking Subscription",
+					"description": _("Subscriptions."),
+				},
 			]
 		},
 		{

@@ -30,32 +30,30 @@ def refresh_available_places(slot,total_places,nb_subscribers):
     )
 
 @frappe.whitelist()
-def update_customers(slot):
+def update_subscriptions(slot):
 
     # get all subscribers of this slot
     subscribers = frappe.get_all("Booking Subscriber", filters={'parent': slot},
-                                 fields=['subscriber', 'present'])
+                                 fields=['subscriber','subscription'])
 
-    for fields in subscribers:
+    for row in subscribers:
         # get subscriber's remaining classes including this class slot update
-        doc = frappe.get_doc('Customer', fields.subscriber)
-        doc.subscription_remaining_classes = get_remaining_classes(doc.name,doc.subscription_total_classes,doc.subscription_start_date)
+        doc = frappe.get_doc('Booking Subscription', row.subscription)
+        doc.remaining_classes = get_remaining_classes(doc.customer, doc.subscribed_classes, doc.name)
 
         # save the Customer Doctype to the database
         doc.save()
 
 @frappe.whitelist()
-def get_remaining_classes(customer_id,total_classes,start_date):
+def get_remaining_classes(customer_id, subscribed_classes, subscription):
 
-    if not total_classes:
-        total_classes=0
+    if not subscribed_classes:
+        subscribed_classes=0
 
-    classes = int(total_classes) - frappe.db.sql("""select COUNT(*)
-        from `tabBooking Subscriber`
-        inner join `tabBooking Slot` on `tabBooking Subscriber`.parent=`tabBooking Slot`.name
-        where `tabBooking Subscriber`.subscriber = %(customer)s and present = 1
-        and CAST(`tabBooking Slot`.time_slot AS DATE)>=%(subscription_date)s""",
-        {"customer": customer_id , "subscription_date": start_date })[0][0]
+    classes = int(subscribed_classes) - frappe.db.sql("""select COUNT(*)
+        from `tabBooking Subscriber` BSU
+        where BSU.subscriber = %(customer)s and BSU.subscription = %(subscription)s and BSU.present = 1""",
+        {"customer": customer_id , "subscription": subscription})[0][0]
 
     # classes = int(total_classes) - frappe.db.count("Booking Subscriber", {"subscriber": customer_id, "present": 1})
 
