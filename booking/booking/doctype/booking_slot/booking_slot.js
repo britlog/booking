@@ -21,6 +21,9 @@ frappe.ui.form.on('Booking Slot', {
 	}
 });
 
+frappe.ui.form.on('Booking Slot', "type", function(frm) {
+    frm.add_fetch('type','default_places','total_places');
+});
 
 frappe.ui.form.on('Booking Slot', "total_places", function(frm) {
     var tbl = frm.doc.subscribers || [];
@@ -42,8 +45,9 @@ frappe.ui.form.on('Booking Slot', "total_places", function(frm) {
             },
             callback: function(r) {
                 //frappe.msgprint(r.message);
-                frm.doc.available_places = r.message;
-                refresh_field("available_places");
+                //frm.doc.available_places = r.message;
+                //refresh_field("available_places");
+                frm.set_value("available_places", r.message);
             }
     });
 
