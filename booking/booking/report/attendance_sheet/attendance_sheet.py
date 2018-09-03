@@ -33,7 +33,7 @@ def get_subscribers(slot):
 			SUB.end_date, BS.cancellation_date, BS.present
 		from `tabBooking Subscriber` BS
 		inner join tabCustomer C on BS.subscriber = C.name
-		inner join `tabBooking Subscription` SUB on BS.subscription = SUB.name
+		left join `tabBooking Subscription` SUB on BS.subscription = SUB.name
 		where BS.parent = %s order by BS.subscriber""", slot, as_dict=0)
 	return subscribers
 
