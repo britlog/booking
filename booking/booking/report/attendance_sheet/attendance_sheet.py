@@ -38,6 +38,8 @@ def get_subscribers(slot):
 	return subscribers
 
 def get_bookings(slot):
-	customers =  frappe.db.sql("""select full_name, name, trial_class, '', '', cancellation_date, present from `tabBooking`
-		where slot=%s order by full_name""", slot, as_dict=0)
-	return customers
+	bookings =  frappe.db.sql("""select B.full_name, B.name, B.trial_class, '', '', BC.cancellation_date, BC.present 
+		from `tabBooking Class` BC
+		inner join `tabBooking` B on BC.booking = B.name
+		where BC.parent = %s order by B.name""", slot, as_dict=0)
+	return bookings

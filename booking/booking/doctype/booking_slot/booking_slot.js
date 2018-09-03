@@ -69,7 +69,13 @@ frappe.ui.form.on('Booking Subscriber', {
 });
 
 frappe.ui.form.on("Booking Subscriber", "present", function(frm,cdt,cdn) {
-    CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
+
+	var row = locals[cdt][cdn];
+	if (!row.subscription) {
+		frappe.msgprint("Veuillez renseigner un abonnement");
+	}
+	else
+    	CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
 //    var customer = frappe.get_doc(cdt, cdn);
 //    frappe.msgprint(customer.subscriber);
 //

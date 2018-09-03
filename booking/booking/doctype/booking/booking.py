@@ -8,6 +8,7 @@ from frappe.model.document import Document
 from frappe import throw, _
 from frappe.core.doctype.sms_settings.sms_settings import send_sms
 from frappe.utils import now_datetime
+from ..booking_subscription.booking_subscription import get_subscriptions
 
 class Booking(Document):
 
@@ -16,6 +17,14 @@ class Booking(Document):
 
 		# set property to the document
 		doc.available_places -= 1
+
+		# insert new booking class into child table
+		subscriptions = get_subscriptions(self.email_id)
+
+		doc.append("bookings", {
+			"booking": self.name,
+			"subscription": subscriptions[0] if subscriptions else ""
+		})
 
 		# save document to the database
 		doc.save()
@@ -151,8 +160,7 @@ class Booking(Document):
 						vous inscrire sur la liste d'attente pour recevoir un mail si une place se libère.""")
 
 		# manage trial class
-		if frappe.get_value("Booking Type",doc.type,'allow_trial_class'):
-			self.trial_class = is_trial_class(self.email_id)
+		self.trial_class = is_trial_class(self.email_id, doc.type)
 
 
 def update_available_places(slot):
@@ -167,11 +175,15 @@ def update_available_places(slot):
 	doc.save()
 
 
-def is_trial_class(email):
-	booking_nb = frappe.db.sql("""select COUNT(*) from `tabBooking` B 
-		inner join `tabBooking Slot` BS on B.slot = BS.name
-		inner join  `tabBooking Type` BT on BS.type = BT.name
-		where B.email_id = %(email)s and BT.allow_trial_class = 1""",
-		{"email": email})[0][0]
+def is_trial_class(email, class_type):
 
-	return True if booking_nb <= 0 else False
+	if not frappe.get_value("Booking Type", class_type, 'allow_trial_class'):
+		return False
+	else:
+		booking_nb = frappe.db.sql("""select COUNT(*) from `tabBooking` B 
+			inner join `tabBooking Slot` BS on B.slot = BS.name
+			inner join  `tabBooking Type` BT on BS.type = BT.name
+			where B.email_id = %(email)s and BT.allow_trial_class = 1""",
+			{"email": email})[0][0]
+
+		return True if booking_nb <= 0 else False

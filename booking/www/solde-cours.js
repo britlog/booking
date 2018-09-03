@@ -16,7 +16,7 @@ frappe.ready(function() {
 		}
 
 		frappe.call({
-			method: 'booking.api.get_subscriptions',
+			method: 'booking.booking.doctype.booking_subscription.booking_subscription.get_subscriptions',
 			args: args,
 			callback: function(r) {
 				//console.log(r.message);
@@ -63,7 +63,7 @@ frappe.ready(function() {
 
 			//print detail classes table
 			frappe.call({
-				method: 'booking.api.get_classes',
+				method: 'booking.booking.doctype.booking_subscription.booking_subscription.get_classes',
 				args: {
             		'subscription_id': $("select option:selected").val()
         		},
