@@ -25,7 +25,7 @@ def get_subscriptions(email_id):
 	inner join `tabDynamic Link` DL on C.name = DL.link_name
 	inner join `tabContact` CT on DL.parent = CT.name
 	where CT.email_id = %(email)s and BSU.disabled = 0
-	order by start_date desc""",
+	order by BSU.start_date desc""",
 	{"str": '%d-%m-%Y', "email": email_id},as_dict=True)
 
 @frappe.whitelist(allow_guest=True)
@@ -35,9 +35,21 @@ def get_classes(subscription_id):
 	select
 		BS.name AS slot,
 		BS.type AS style,
-		SUB.present
+		BS.time_slot,
+		TBS.present,
+		"" AS booking_no
 	from `tabBooking Slot` BS   
-	inner join `tabBooking Subscriber` SUB on BS.name=SUB.parent
-	where SUB.subscription = %(subscription)s
-	order by BS.time_slot desc""",
+	inner join `tabBooking Subscriber` TBS on BS.name = TBS.parent
+	where TBS.subscription = %(subscription)s	
+	union ALL
+	select
+		BS.name AS slot,
+		BS.type AS style,
+		BS.time_slot,
+		TBC.present,
+		TBC.booking AS booking_no
+	from `tabBooking Slot` BS   
+	inner join `tabBooking Class` TBC on BS.name = TBC.parent
+	where TBC.subscription = %(subscription)s	
+	order by time_slot desc""",
 	{"subscription": subscription_id},as_dict=True)

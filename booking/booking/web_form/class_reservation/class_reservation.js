@@ -137,9 +137,29 @@ frappe.ready(function() {
             }
 		}
 
-        $('.btn-form-submit').off('click');                 // removing all binds
-        $('.btn-form-submit').click(clickListener.handler); // rebind click event for saving
-        $('.btn-form-submit').triggerHandler('click');      // save
+		// Check if catch up class is allowed or display a warning message
+		frappe.call({
+            method: 'booking.booking.doctype.booking.booking.is_booking_allowed',
+            args: {
+                'email_id': email
+            },
+            callback: function(r) {
+                console.log(r.message);
+                //frappe.msgprint();
+                var bCancel = false
+                if (!r.message) {
+                	// Subscription found but doesn't allow bookings
+                	if (!confirm('Cours hors abonnement, souhaitez-vous valider la réservation ?')) {
+						bCancel = true;
+					}
+                }
+                if (!bCancel) {
+                	$('.btn-form-submit').off('click');                 // removing all binds
+					$('.btn-form-submit').click(clickListener.handler); // rebind click event for saving
+					$('.btn-form-submit').triggerHandler('click');      // save
+                }
+            }
+        });
 
 		return false;
 	});

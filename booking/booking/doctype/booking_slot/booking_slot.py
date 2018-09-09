@@ -20,40 +20,43 @@ class BookingSlot(Document):
         pass
 
 @frappe.whitelist()
-def refresh_available_places(slot,total_places,nb_subscribers):
-
-    return str( int(total_places)
-          # - frappe.db.count("Booking",{"slot": ["=", slot], "cancellation_date": ""})
-          - frappe.db.sql("""select COUNT(*) from `tabBooking` where slot = %(slot)s and cancellation_date is null""",
-                        {"slot": slot})[0][0]
-          - int(nb_subscribers)
-    )
-
-@frappe.whitelist()
 def update_subscriptions(slot):
 
     # get all subscribers of this slot
-    subscribers = frappe.get_all("Booking Subscriber", filters={'parent': slot},
-                                 fields=['subscriber','subscription'])
-
+    subscribers = frappe.get_all("Booking Subscriber", filters=[["parent", "=", slot], ["subscription","!=", ""]],
+                                 fields=['subscription'])
     for row in subscribers:
-        # get subscriber's remaining classes including this class slot update
+        # get subscription remaining classes including this class slot update
         doc = frappe.get_doc('Booking Subscription', row.subscription)
-        doc.remaining_classes = get_remaining_classes(doc.customer, doc.subscribed_classes, doc.name)
+        doc.remaining_classes = get_remaining_classes(doc.subscribed_classes, doc.name)
 
-        # save the Customer Doctype to the database
+        # save the Subscription Doctype to the database
+        doc.save()
+
+    # get all bookings of this slot
+    bookings = frappe.get_all("Booking Class", filters=[["parent", "=", slot], ["subscription", "!=", ""]],
+                                 fields=['subscription'])
+    for row in bookings:
+        # get subscription remaining classes including this class slot update
+        doc = frappe.get_doc('Booking Subscription', row.subscription)
+        doc.remaining_classes = get_remaining_classes(doc.subscribed_classes, doc.name)
+
+        # save the Subscription Doctype to the database
         doc.save()
 
 @frappe.whitelist()
-def get_remaining_classes(customer_id, subscribed_classes, subscription):
+def get_remaining_classes(subscribed_classes, subscription):
 
     if not subscribed_classes:
         subscribed_classes=0
 
-    classes = int(subscribed_classes) - frappe.db.sql("""select COUNT(*)
-        from `tabBooking Subscriber` BSU
-        where BSU.subscriber = %(customer)s and BSU.subscription = %(subscription)s and BSU.present = 1""",
-        {"customer": customer_id , "subscription": subscription})[0][0]
+    classes = int(subscribed_classes) \
+        - frappe.db.sql("""select COUNT(*) from `tabBooking Subscriber`
+            where subscription = %(subscription)s and present = 1""",
+            {"subscription": subscription})[0][0] \
+        - frappe.db.sql("""select COUNT(*) from `tabBooking Class`
+            where subscription = %(subscription)s and present = 1""",
+            {"subscription": subscription})[0][0]
 
     # classes = int(total_classes) - frappe.db.count("Booking Subscriber", {"subscriber": customer_id, "present": 1})
 

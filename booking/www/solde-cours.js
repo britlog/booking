@@ -26,14 +26,14 @@ frappe.ready(function() {
 					$('[id="subscriptions"]').empty();
 					$('[id="subscriptions"]').append($('<option>').val('').text("{{ _("Pick a subscription") }}"));
 					(r.message || []).forEach(function(row){
-						$('[id="subscriptions"]').append($('<option>').val(row.name).text(row.start_date+" "+row.reference)
+						$('[id="subscriptions"]').append($('<option>').val(row.name).text(row.name+" : "+row.start_date+" "+row.reference)
 						.attr('subscribed_classes',row.subscribed_classes)
 						.attr('remaining_classes',row.remaining_classes)
 						.attr('end_date',row.end_date));
 					});
 				}
 				else {
-					msgprint("Adresse email non reconnue, veuillez contacter Santani Yoga");
+					msgprint("Aucun abonnement trouvé avec cette adresse e-mail");
 					$('[id="subscriptions"]').toggle(false);
 				}
 
@@ -74,12 +74,14 @@ frappe.ready(function() {
 						var tableData = '<tr>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;">Historique des cours</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;">Style</th>'
+						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Réservation</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Présence</th>'
 						tableData+='</tr>';
 						(r.message || []).forEach(function(row){
 								tableData += '<tr>';
 								tableData += '<td>' + row.slot + '</td>';
 								tableData += '<td>' + row.style + '</td>';
+								tableData += '<td>' + row.booking_no + '</td>';
 								if (row.present)
 									tableData += '<td style="text-align: center;"><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
 								else

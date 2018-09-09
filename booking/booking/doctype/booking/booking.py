@@ -8,7 +8,6 @@ from frappe.model.document import Document
 from frappe import throw, _
 from frappe.core.doctype.sms_settings.sms_settings import send_sms
 from frappe.utils import now_datetime
-from ..booking_subscription.booking_subscription import get_subscriptions
 
 class Booking(Document):
 
@@ -19,11 +18,12 @@ class Booking(Document):
 		doc.available_places -= 1
 
 		# insert new booking class into child table
-		subscriptions = get_subscriptions(self.email_id)
+		subscriptions = get_subscription(self.email_id)
 
 		doc.append("bookings", {
 			"booking": self.name,
-			"subscription": subscriptions[0] if subscriptions else ""
+			"subscriber": subscriptions[0]["customer"] if subscriptions else "",
+			"subscription": subscriptions[0]["subscription"] if subscriptions else ""
 		})
 
 		# save document to the database
@@ -118,25 +118,26 @@ class Booking(Document):
 				frappe.log_error(frappe.get_traceback(),'email to company failed')  # Otherwise, booking is not registered in database if errors
 
 
-	def on_trash(self):
-		doc = frappe.get_doc("Booking Slot", self.slot)
+	# def on_trash(self):
+	# 	doc = frappe.get_doc("Booking Slot", self.slot)
+	#
+	# 	# add available place if this booking was not already cancelled
+	# 	if not self.cancellation_date:
+	# 		doc.available_places += 1
+	#
+	# 	# save a document to the database
+	# 	doc.save()
 
-		# add available place if this booking was not already cancelled
-		if not self.cancellation_date:
-			doc.available_places += 1
-
-		# save a document to the database
-		doc.save()
-
-	def on_update(self):
-		update_available_places(self.slot)
+	# def on_update(self):
+	# 	update_available_places(self.slot)
 
 	def before_insert(self):
 
 		# check if already registered
 		booked = frappe.db.sql("""select COUNT(*)
-				 from `tabBooking`
-				 where `tabBooking`.slot = %(slot)s and `tabBooking`.email_id = %(email)s""",
+				 from `tabBooking Class` TBC
+				 inner join `tabBooking` TB on TBC.booking = TB.name 
+				 where TBC.parent = %(slot)s and TB.email_id = %(email)s""",
 				 {"slot": self.slot, "email": self.email_id})[0][0]
 
 		booked += frappe.db.sql("""select COUNT(*)
@@ -163,16 +164,16 @@ class Booking(Document):
 		self.trial_class = is_trial_class(self.email_id, doc.type)
 
 
-def update_available_places(slot):
-	doc = frappe.get_doc("Booking Slot", slot)
-
-	doc.available_places = doc.total_places \
-		- frappe.db.sql("""select COUNT(*) from `tabBooking` where slot = %(slot)s and cancellation_date is null""",
-		{"slot": slot})[0][0] \
-		- frappe.db.sql("""select COUNT(*) from `tabBooking Subscriber` where parent = %(slot)s and cancellation_date is null""",
-		{"slot": slot})[0][0]
-
-	doc.save()
+# def update_available_places(slot):
+# 	doc = frappe.get_doc("Booking Slot", slot)
+#
+# 	doc.available_places = doc.total_places \
+# 		- frappe.db.sql("""select COUNT(*) from `tabBooking Class` where parent = %(slot)s and cancellation_date is null""",
+# 		{"slot": slot})[0][0] \
+# 		- frappe.db.sql("""select COUNT(*) from `tabBooking Subscriber` where parent = %(slot)s and cancellation_date is null""",
+# 		{"slot": slot})[0][0]
+#
+# 	doc.save()
 
 
 def is_trial_class(email, class_type):
@@ -187,3 +188,33 @@ def is_trial_class(email, class_type):
 			{"email": email})[0][0]
 
 		return True if booking_nb <= 0 else False
+
+
+def get_subscription(email_id):
+
+	return frappe.db.sql("""
+	select	C.name as customer, BSU.name as subscription
+	from `tabBooking Subscription` BSU
+	inner join `tabCustomer` C on BSU.customer = C.name
+	inner join `tabDynamic Link` DL on C.name = DL.link_name
+	inner join `tabContact` CT on DL.parent = CT.name
+	where CT.email_id = %(email)s and BSU.disabled = 0 and BSU.allow_booking = 1""",
+	{"email": email_id},as_dict=True)
+
+
+@frappe.whitelist(allow_guest=True)
+def is_booking_allowed(email_id):
+
+	subscriptions =  frappe.db.sql("""
+	select	COUNT(*) as nb_subscriptions, SUM(BSU.allow_booking) as allow_booking from `tabBooking Subscription` BSU
+	inner join `tabCustomer` C on BSU.customer = C.name
+	inner join `tabDynamic Link` DL on C.name = DL.link_name
+	inner join `tabContact` CT on DL.parent = CT.name
+	where CT.email_id = %(email)s and BSU.disabled = 0""",
+	{"email": email_id},as_dict=True)
+
+	# if no subscription or at least one subscription allows booking
+	if subscriptions[0]["nb_subscriptions"] <= 0 or subscriptions[0]["allow_booking"] > 0:
+		return True
+	else:
+		return False
