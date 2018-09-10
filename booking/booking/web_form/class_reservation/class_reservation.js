@@ -40,7 +40,8 @@ frappe.ready(function() {
                     available_message = row.available_places+" places disponibles";
                 }
                 $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" | "+row.type.toUpperCase()+" | "+available_message)
-                .attr('available_places',row.available_places).attr('subscription_places',row.subscription_places));
+                .attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
+                .attr('class_type',row.type));
 
 //                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
             });
@@ -139,19 +140,23 @@ frappe.ready(function() {
 
 		// Check if catch up class is allowed or display a warning message
 		frappe.call({
-            method: 'booking.booking.doctype.booking.booking.is_booking_allowed',
+            method: 'booking.booking.doctype.booking.booking.get_subscriptions',
             args: {
-                'email_id': email
+                'email_id': email,
+                'class_type': $("select option:selected").attr('class_type')
             },
             callback: function(r) {
-                console.log(r.message);
-                //frappe.msgprint();
+                //console.log(r.message);
+
                 var bCancel = false
-                if (!r.message) {
-                	// Subscription found but doesn't allow bookings
-                	if (!confirm('Cours hors abonnement, souhaitez-vous valider la réservation ?')) {
-						bCancel = true;
-					}
+                if (r.message) {
+                	// At least 1 subscription found for this email id
+                	if (!r.message[0].subscription) {
+						// But no more catch up classes or outside subscription type
+						if (!confirm('Cours hors abonnement, souhaitez-vous valider la réservation ?')) {
+							bCancel = true;
+						}
+                	}
                 }
                 if (!bCancel) {
                 	$('.btn-form-submit').off('click');                 // removing all binds

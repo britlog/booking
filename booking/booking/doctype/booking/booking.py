@@ -18,12 +18,12 @@ class Booking(Document):
 		doc.available_places -= 1
 
 		# insert new booking class into child table
-		subscriptions = get_subscription(self.email_id)
+		subscriptions = get_subscriptions(self.email_id, doc.type)
 
 		doc.append("bookings", {
 			"booking": self.name,
 			"subscriber": subscriptions[0]["customer"] if subscriptions else "",
-			"subscription": subscriptions[0]["subscription"] if subscriptions else ""
+			"subscription": subscriptions[0]["subscription"] if len(subscriptions) == 1 else ""
 		})
 
 		# save document to the database
@@ -190,31 +190,21 @@ def is_trial_class(email, class_type):
 		return True if booking_nb <= 0 else False
 
 
-def get_subscription(email_id):
-
-	return frappe.db.sql("""
-	select	C.name as customer, BSU.name as subscription
-	from `tabBooking Subscription` BSU
-	inner join `tabCustomer` C on BSU.customer = C.name
-	inner join `tabDynamic Link` DL on C.name = DL.link_name
-	inner join `tabContact` CT on DL.parent = CT.name
-	where CT.email_id = %(email)s and BSU.disabled = 0 and BSU.allow_booking = 1""",
-	{"email": email_id},as_dict=True)
-
-
 @frappe.whitelist(allow_guest=True)
-def is_booking_allowed(email_id):
+def get_subscriptions(email_id, class_type):
 
-	subscriptions =  frappe.db.sql("""
-	select	COUNT(*) as nb_subscriptions, SUM(BSU.allow_booking) as allow_booking from `tabBooking Subscription` BSU
-	inner join `tabCustomer` C on BSU.customer = C.name
-	inner join `tabDynamic Link` DL on C.name = DL.link_name
-	inner join `tabContact` CT on DL.parent = CT.name
-	where CT.email_id = %(email)s and BSU.disabled = 0""",
-	{"email": email_id},as_dict=True)
+	subscriptions = frappe.db.sql("""
+		select	C.name as customer, (case when BSU.manage_catch_up = 1 and BSU.remaining_catch_up <= 0 then "" else BSU.name end) as subscription
+		from `tabBooking Subscription` BSU
+		inner join `tabCustomer` C on BSU.customer = C.name
+		inner join `tabDynamic Link` DL on C.name = DL.link_name
+		inner join `tabContact` CT on DL.parent = CT.name
+		where CT.email_id = %(email)s and BSU.remaining_classes > 0 and BSU.disabled = 0
+		order by BSU.remaining_catch_up DESC""",
+		{"email": email_id}, as_dict=True)
 
-	# if no subscription or at least one subscription allows booking
-	if subscriptions[0]["nb_subscriptions"] <= 0 or subscriptions[0]["allow_booking"] > 0:
-		return True
-	else:
-		return False
+	if subscriptions:
+		if frappe.get_value("Booking Type", class_type, 'outside_subscription'):
+			subscriptions[0]["subscription"] = ""
+
+	return subscriptions
