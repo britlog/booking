@@ -31,7 +31,7 @@ TODO,Booking Subscription,Abonnement
 TODO,Reference,Référence
 TODO,Pick a subscription,Choisissez un abonnement
 TODO,Enable Catch Up,Activer Rattrapage
-TODO,A warning will be displayed while booking if allowed catch up classes are over,Un avertissement sera affiché pendant la réservation si les cours de rattrapage autorisés sont épuisés
+TODO,A warning will be displayed to subscribers while booking if allowed catch up classes are over,Un avertissement sera affiché aux abonnés pendant la réservation si les cours de rattrapage autorisés sont épuisés
 TODO,Catch Up Class,Rattrapage
 TODO,Allowed Catch Up,Rattrapages Autorisés
 TODO,Remaining Catch Up,Rattrapages Restants
