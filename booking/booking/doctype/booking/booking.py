@@ -194,7 +194,9 @@ def is_trial_class(email, class_type):
 def get_subscriptions(email_id, class_type):
 
 	subscriptions = frappe.db.sql("""
-		select	C.name as customer, (case when BSU.manage_catch_up = 1 and BSU.remaining_catch_up <= 0 then "" else BSU.name end) as subscription
+		select	C.name as customer, 
+			    BSU.name as subscription,
+			    BSU.remaining_catch_up
 		from `tabBooking Subscription` BSU
 		inner join `tabCustomer` C on BSU.customer = C.name
 		inner join `tabDynamic Link` DL on C.name = DL.link_name
@@ -204,6 +206,9 @@ def get_subscriptions(email_id, class_type):
 		{"email": email_id}, as_dict=True)
 
 	if subscriptions:
+		if frappe.db.get_single_value('Booking Settings', 'enable_catch_up') and not subscriptions[0]["remaining_catch_up"] :
+			subscriptions[0]["subscription"] = ""
+
 		if frappe.get_value("Booking Type", class_type, 'outside_subscription'):
 			subscriptions[0]["subscription"] = ""
 

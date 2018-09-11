@@ -41,7 +41,7 @@ frappe.ready(function() {
                 }
                 $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" | "+row.type.toUpperCase()+" | "+available_message)
                 .attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
-                .attr('class_type',row.type));
+                .attr('class_type',row.type).attr('free_class',row.free_class));
 
 //                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
             });
@@ -151,8 +151,9 @@ frappe.ready(function() {
                 var bCancel = false
                 if (r.message) {
                 	// At least 1 subscription found for this email id
-                	if (!r.message[0].subscription) {
-						// But no more catch up classes or outside subscription type
+                	if (r.message[0].customer && !r.message[0].subscription
+                		&& !parseInt($("select option:selected").attr('free_class'))) {
+						// But no more catch up classes or outside subscription type, and not free class
 						if (!confirm('Cours hors abonnement, souhaitez-vous valider la réservation ?')) {
 							bCancel = true;
 						}
