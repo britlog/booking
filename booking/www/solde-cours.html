@@ -30,7 +30,7 @@
 </div>
 <br>
 <div class="row">
-	<div class="col-sm-6">
+	<div class="col-sm-8">
 		<table id="matable" style="width:100%;display: none;">
 		</table>
 	</div>
@@ -39,6 +39,27 @@
 <script>
 var msgprint = function(txt) {
 	if(txt) $("#contact-alert").html(txt).toggle(true);
+}
+var cancel_class = function(slot, booking_no) {
+
+		frappe.call({
+				method: 'booking.booking.doctype.booking_subscription.booking_subscription.report_absence',
+				args: {
+					'slot':slot,
+            		'subscription_id': $("select option:selected").val(),
+            		'booking_no': booking_no
+        		},
+				callback: function(r) {
+					if(r.message) {
+						//console.log(r.message);
+						$("[id='"+slot+"']").prop('value', 'Absence enregistrée');
+						$("[id='"+slot+"']").prop("disabled",true);
+					}
+					if(r.exc) {
+						frappe.msgprint(r.exc);
+					}
+				}
+		});
 }
 </script>
 <!--<script type="text/javascript" src="solde-cours.js"></script>-->

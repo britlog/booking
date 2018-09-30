@@ -76,16 +76,28 @@ frappe.ready(function() {
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;">Style</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Réservation</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Présence</th>'
+						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Annulation</th>'
 						tableData+='</tr>';
 						(r.message || []).forEach(function(row){
 								tableData += '<tr>';
 								tableData += '<td>' + row.slot + '</td>';
 								tableData += '<td>' + row.style + '</td>';
-								tableData += '<td>' + row.booking_no + '</td>';
+								tableData += '<td style="text-align: center;">' + row.booking_no + '</td>';
 								if (row.present)
 									tableData += '<td style="text-align: center;"><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
 								else
 									tableData += '<td style="text-align: center;"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
+
+								if (row.cancellation_date)
+									tableData += '<td style="text-align: center;">' + row.cancellation_date + '</td>';
+								else {
+									var CurrentDate = new Date();
+									var TimeSlotDate = new Date(row.time_slot);
+
+									if (TimeSlotDate > CurrentDate)
+										tableData += '<td style="padding: 5px;"><input class="btn btn-primary" type="button" id="'+ row.slot +'" \
+												 value="Signaler une absence" onclick="cancel_class(this.id,\''+row.booking_no+'\');"></td>';
+								}
 								tableData += '</tr>';
 						});
 						$('#matable').html(tableData).toggle(true);

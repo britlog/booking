@@ -37,7 +37,8 @@ def get_classes(subscription_id):
 		BS.type AS style,
 		BS.time_slot,
 		TBS.present,
-		"" AS booking_no
+		"" AS booking_no,
+		DATE_FORMAT(TBS.cancellation_date,%(str)s) AS cancellation_date
 	from `tabBooking Slot` BS   
 	inner join `tabBooking Subscriber` TBS on BS.name = TBS.parent
 	where TBS.subscription = %(subscription)s	
@@ -47,9 +48,37 @@ def get_classes(subscription_id):
 		BS.type AS style,
 		BS.time_slot,
 		TBC.present,
-		TBC.booking AS booking_no
+		TBC.booking AS booking_no,
+		DATE_FORMAT(TBC.cancellation_date,%(str)s) AS cancellation_date
 	from `tabBooking Slot` BS   
 	inner join `tabBooking Class` TBC on BS.name = TBC.parent
 	where TBC.subscription = %(subscription)s	
 	order by time_slot desc""",
-	{"subscription": subscription_id},as_dict=True)
+	{"str": '%d-%m-%Y %H:%i',"subscription": subscription_id},as_dict=True)
+
+@frappe.whitelist(allow_guest=True)
+def report_absence(slot, subscription_id, booking_no):
+
+	if booking_no:
+		frappe.db.sql("""
+			update `tabBooking Class` SET cancellation_date = NOW()
+			where parent = %(parent)s and subscription = %(subscription)s """,
+			{"parent": slot, "subscription": subscription_id})
+	else:
+		frappe.db.sql("""
+			update `tabBooking Subscriber` SET cancellation_date = NOW()
+			where parent = %(parent)s and subscription = %(subscription)s """,
+			{"parent":slot, "subscription": subscription_id})
+
+	frappe.db.commit()
+
+	# free 1 place
+	doc = frappe.get_doc("Booking Slot", slot)
+
+	# set property to the document
+	doc.available_places += 1
+
+	# save document to the database
+	doc.save()
+
+	return True
