@@ -89,10 +89,10 @@ frappe.ready(function() {
 									tableData += '<td style="text-align: center;"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 
 								if (row.cancellation_date)
-									tableData += '<td style="text-align: center;">' + row.cancellation_date + '</td>';
+									tableData += '<td>' + row.cancellation_date + '</td>';
 								else {
 									var CurrentDate = new Date();
-									var TimeSlotDate = new Date(row.time_slot);
+									var TimeSlotDate = new Date(row.time_slot.replace(/\s/, 'T'));
 
 									if (TimeSlotDate > CurrentDate)
 										tableData += '<td style="padding: 5px;"><input class="btn btn-primary" type="button" id="'+ row.slot +'" \
