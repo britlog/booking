@@ -33,35 +33,6 @@ class Booking(Document):
 		email = self.email_id
 
 		if email:
-			url = frappe.utils.get_url("/files/logo_santani_small.png")
-
-			messages = (
-				_("Bonjour"),
-				_("J'ai le plaisir de vous informer que votre réservation n°"),
-				self.name,
-				_("est confirmée pour le"),
-				self.slot,
-				_("N'oubliez pas de prévenir en cas d'absence. Merci."),
-				_("Namasté"),
-				url
-			)
-
-			content = """
-				<div style="font-family: verdana; font-size: 16px;">
-				<p>{0},<p>
-				<p>{1} {2} {3}</p>
-				<p><strong>{4}</strong></p>
-				<p>{5}</p>
-				<p>{6},<br>Tonya</p>
-				<img alt="Santani Yoga" src="{7}">
-				</div>
-				"""
-
-			try:
-				frappe.sendmail(email, subject=_("Votre cours de yoga"), content=content.format(*messages))
-			except Exception as e:
-				frappe.log_error(frappe.get_traceback(), 'email failed')    # Otherwise, booking is not registered in database if errors
-
 			# add email to the main newsletter
 			parsed_email = frappe.utils.validate_email_add(email, False)
 			email_group = _("Website", lang='fr')
