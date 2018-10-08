@@ -141,3 +141,7 @@ frappe.ui.form.on("Booking Slot", "onload", function(frm, cdt, cdn) {
 frappe.ui.form.on('Booking Class', "booking", function(frm) {
     frm.add_fetch('booking','full_name','full_name');
 });
+// Get full_name when select customer
+frappe.ui.form.on('Booking Class', "subscriber", function(frm) {
+    frm.add_fetch('subscriber','customer_name','full_name');
+});
