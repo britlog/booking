@@ -136,3 +136,8 @@ frappe.ui.form.on("Booking Slot", "onload", function(frm, cdt, cdn) {
 			};
 		});
 });
+
+// Get full_name when select booking number
+frappe.ui.form.on('Booking Class', "booking", function(frm) {
+    frm.add_fetch('booking','full_name','full_name');
+});
