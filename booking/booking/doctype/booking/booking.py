@@ -21,6 +21,7 @@ class Booking(Document):
 		subscriptions = get_subscriptions(self.email_id, doc.type)
 
 		doc.append("bookings", {
+			"full_name": self.full_name,
 			"booking": self.name,
 			"subscriber": subscriptions[0]["customer"] if subscriptions else "",
 			"subscription": subscriptions[0]["subscription"] if len(subscriptions) == 1 else ""
