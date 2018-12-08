@@ -139,11 +139,12 @@ frappe.ready(function() {
 		}
 
 		// Check if catch up class is allowed or display a warning message
+		var class_type = $("select option:selected").attr('class_type');
 		frappe.call({
             method: 'booking.booking.doctype.booking.booking.get_subscriptions',
             args: {
                 'email_id': email,
-                'class_type': $("select option:selected").attr('class_type')
+                'class_type': class_type
             },
             callback: function(r) {
                 //console.log(r.message);
