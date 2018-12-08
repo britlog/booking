@@ -84,8 +84,13 @@ class Booking(Document):
 				<p>{6} : {7}</p>
 				</div>
 				"""
+
+			subject =  "Réservation de " + self.full_name
+			if self.comment:
+				subject += "*"
+
 			try:
-				frappe.sendmail(recipients=forward_to_email, sender=email, content=content.format(*messages), subject="Réservation de "+self.full_name)
+				frappe.sendmail(recipients=forward_to_email, sender=email, content=content.format(*messages), subject=subject)
 			except Exception as e:
 				frappe.log_error(frappe.get_traceback(),'email to company failed')  # Otherwise, booking is not registered in database if errors
 
