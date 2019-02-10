@@ -86,6 +86,10 @@ frappe.ui.form.on("Booking Subscriber", "present", function(frm,cdt,cdn) {
 
 });
 
+frappe.ui.form.on("Booking Subscriber", "subscription", function(frm,cdt,cdn) {
+	CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
+});
+
 frappe.ui.form.on("Booking Class", "present", function(frm,cdt,cdn) {
 
 	var row = locals[cdt][cdn];
@@ -97,6 +101,10 @@ frappe.ui.form.on("Booking Class", "present", function(frm,cdt,cdn) {
 	else
     	CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
 
+});
+
+frappe.ui.form.on("Booking Class", "subscription", function(frm,cdt,cdn) {
+	CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
 });
 
 frappe.ui.form.on("Booking Subscriber", "cancellation_date", function(frm,cdt,cdn) {
