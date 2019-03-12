@@ -83,4 +83,4 @@ def get_remaining_classes(subscribed_classes, subscription):
     # if lost>0:
     #     classes -= lost  # lost classes
 
-    return max(0,classes)
+    return classes #max(0,classes)
