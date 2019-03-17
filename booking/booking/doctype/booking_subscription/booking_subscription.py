@@ -9,6 +9,84 @@ from frappe.model.document import Document
 class BookingSubscription(Document):
 	pass
 
+@frappe.whitelist()
+def update_subscriptions(slot=None):
+
+	# get all customers in the slot
+	# it limits the calculation if defined, mostly when a booking slot is saved
+	if slot:
+		customers = frappe.db.sql("""
+			select TBS.subscriber
+			from `tabBooking Slot` BS   
+			inner join `tabBooking Subscriber` TBS on BS.name = TBS.parent
+			where TBS.subscriber is not null and BS.name = %(slot)s	
+			union
+			select TBC.subscriber
+			from `tabBooking Slot` BS   
+			inner join `tabBooking Class` TBC on BS.name = TBC.parent
+			where TBC.subscriber is not null and BS.name = %(slot)s""",
+				{"slot": slot}, as_dict=False)
+
+		# get all active subscriptions of customers in this slot
+		subscriptions = frappe.get_all("Booking Subscription",
+			filters=[ ["disabled", "=", 0], ["customer", "in", [customer[0] for customer in customers]] ],
+			fields=['name'])
+
+	else:
+		# get all active subscriptions
+		subscriptions = frappe.get_all("Booking Subscription",
+			filters=[["disabled", "=", 0]],
+			fields=['name'])
+
+	for subscription in subscriptions:
+		doc = frappe.get_doc('Booking Subscription', subscription.name)
+		doc.remaining_classes = get_remaining_classes(doc.subscribed_classes, doc.name)
+
+		# save the Subscription Doctype to the database
+		doc.save()
+
+
+@frappe.whitelist()
+def get_remaining_classes(subscribed_classes, subscription):
+
+	if not subscribed_classes:
+		subscribed_classes=0
+
+	classes = int(subscribed_classes) \
+		- frappe.db.sql("""select COUNT(*) from `tabBooking Subscriber`
+			where subscription = %(subscription)s and present = 1""",
+			{"subscription": subscription})[0][0] \
+		- frappe.db.sql("""select COUNT(*) from `tabBooking Class`
+			where subscription = %(subscription)s and present = 1""",
+			{"subscription": subscription})[0][0]
+
+	# classes = int(total_classes) - frappe.db.count("Booking Subscriber", {"subscriber": customer_id, "present": 1})
+
+	# missed = frappe.db.sql("""select COUNT(*)
+	#     from `tabBooking Subscriber`
+	#     inner join `tabBooking Slot` on `tabBooking Subscriber`.parent=`tabBooking Slot`.name
+	#     where `tabBooking Subscriber`.subscriber = %(customer)s and present = 0
+	#     and CAST(`tabBooking Slot`.time_slot AS DATE)>=%(subscription_date)s""",
+	#     {"customer": customer_id , "subscription_date": start_date})[0][0]
+	#
+	# # missed = frappe.db.count("Booking Subscriber",{"subscriber": customer_id, "present": 0})
+	#
+	# if total_classes == 10:
+	#     max_missed = 2
+	# elif total_classes == 20:
+	#     max_missed = 4
+	# elif total_classes == 40:
+	#     max_missed = 8
+	# else:
+	#     max_missed = 99  # unlimited
+	#
+	# lost = missed - max_missed
+	#
+	# if lost>0:
+	#     classes -= lost  # lost classes
+
+	return classes #max(0,classes)
+
 @frappe.whitelist(allow_guest=True)
 def get_subscriptions(email_id):
 

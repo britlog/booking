@@ -1,26 +1,6 @@
 // Copyright (c) 2016, Britlog and contributors
 // For license information, please see license.txt
 
-var CustomerClassesUpdate = false;  //Update customer remaining classes if present is checked
-
-frappe.ui.form.on('Booking Slot', {
-	refresh: function(frm) {
-        if (CustomerClassesUpdate) {
-            //frappe.msgprint("REFRESH");
-            frappe.call({
-                method: "booking.booking.doctype.booking_slot.booking_slot.update_subscriptions",
-                args: {
-                    "slot": frm.doc.name
-                },
-                callback: function(r) {
-                    //frappe.msgprint(r.message);
-                }
-            });
-            CustomerClassesUpdate = false;
-        }
-	}
-});
-
 frappe.ui.form.on('Booking Slot', "type", function(frm) {
     frm.add_fetch('type','default_places','total_places');
 });
@@ -49,27 +29,19 @@ frappe.ui.form.on('Booking Slot', "total_places", function(frm) {
 
 frappe.ui.form.on('Booking Subscriber', {
     subscribers_remove: function(frm) {
-//		frm.doc.available_places += 1;
-//		refresh_field("available_places");
         frm.trigger("total_places");
-        CustomerClassesUpdate = true;
     },
     subscribers_add: function(frm) {
-//        frm.doc.available_places -= 1;
-//        refresh_field("available_places");
         frm.trigger("total_places");
-        CustomerClassesUpdate = true;
     }
 });
 
 frappe.ui.form.on('Booking Class', {
     bookings_remove: function(frm) {
         frm.trigger("total_places");
-        CustomerClassesUpdate = true;
     },
     bookings_add: function(frm) {
         frm.trigger("total_places");
-        CustomerClassesUpdate = true;
     }
 });
 
@@ -81,13 +53,7 @@ frappe.ui.form.on("Booking Subscriber", "present", function(frm,cdt,cdn) {
 		row.present = false;
 		refresh_field("subscribers");
 	}
-	else
-    	CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
 
-});
-
-frappe.ui.form.on("Booking Subscriber", "subscription", function(frm,cdt,cdn) {
-	CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
 });
 
 frappe.ui.form.on("Booking Class", "present", function(frm,cdt,cdn) {
@@ -98,13 +64,7 @@ frappe.ui.form.on("Booking Class", "present", function(frm,cdt,cdn) {
 		row.present = false;
 		refresh_field("bookings");
 	}
-	else
-    	CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
 
-});
-
-frappe.ui.form.on("Booking Class", "subscription", function(frm,cdt,cdn) {
-	CustomerClassesUpdate = true;   //Refresh event will be triggered on saving form
 });
 
 frappe.ui.form.on("Booking Subscriber", "cancellation_date", function(frm,cdt,cdn) {

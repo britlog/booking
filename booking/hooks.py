@@ -93,6 +93,9 @@ app_license = "GNU General Public License"
 scheduler_events = {
 	"all": [
 		"booking.booking.doctype.booking_notification.booking_notification.send_notification_email"
+	],
+	"daily": [
+		"booking.booking.doctype.booking_subscription.booking_subscription.update_subscriptions"
 	]
 }
 # scheduler_events = {

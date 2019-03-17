@@ -15,7 +15,7 @@ frappe.ui.form.on('Booking Subscription', "subscribed_classes", function(frm) {
 	}
 
     frappe.call({
-        method: "booking.booking.doctype.booking_slot.booking_slot.get_remaining_classes",
+        method: "booking.booking.doctype.booking_subscription.booking_subscription.get_remaining_classes",
         args: {
             "subscribed_classes": frm.doc.subscribed_classes,
             "subscription": frm.doc.name
