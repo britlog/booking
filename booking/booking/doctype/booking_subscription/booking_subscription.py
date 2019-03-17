@@ -40,10 +40,13 @@ def update_subscriptions(slot=None):
 
 	for subscription in subscriptions:
 		doc = frappe.get_doc('Booking Subscription', subscription.name)
-		doc.remaining_classes = get_remaining_classes(doc.subscribed_classes, doc.name)
+		remaining_classes = get_remaining_classes(doc.subscribed_classes, doc.name)
 
-		# save the Subscription Doctype to the database
-		doc.save()
+		if doc.remaining_classes != remaining_classes:
+			doc.remaining_classes = remaining_classes
+
+			# save the Subscription Doctype to the database
+			doc.save()
 
 
 @frappe.whitelist()
