@@ -65,7 +65,9 @@ class Booking(Document):
 
 		# always send notification email to company master
 		forward_to_email = frappe.db.get_value("Contact Us Settings", None, "forward_to_email")
-		if forward_to_email:
+		comment_only_email_notify = frappe.db.get_single_value('Booking Settings', 'comment_only_email_notify')
+
+		if forward_to_email and (self.comment or not comment_only_email_notify):
 			messages = (
 				_("Nouvelle réservation n°"),
 				self.name,
@@ -86,7 +88,7 @@ class Booking(Document):
 				"""
 
 			subject =  "Réservation de " + self.full_name
-			if self.comment:
+			if self.comment and not comment_only_email_notify:
 				subject += "*"
 
 			try:
