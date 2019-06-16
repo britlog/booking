@@ -50,7 +50,7 @@ frappe.ready(function() {
     });
 
     function valid_email_fr(id) {
-	    return (id.toLowerCase().search("^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$")==-1) ? 0 : 1;
+	    return (id.toLowerCase().search("^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")==-1) ? 0 : 1;
     }
 
     function valid_phone(id,mobile) {
