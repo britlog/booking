@@ -18,7 +18,7 @@
  "is_standard": 1, 
  "login_required": 0, 
  "max_attachment_size": 0, 
- "modified": "2018-09-10 20:21:42.510878", 
+ "modified": "2019-08-13 23:57:42.510878",
  "modified_by": "Administrator", 
  "module": "Booking", 
  "name": "class-reservation", 
@@ -29,7 +29,7 @@
  "show_sidebar": 0, 
  "sidebar_items": [], 
  "success_message": "Merci pour la r\u00e9servation.\nVous allez recevoir une confirmation par e-mail (et SMS si demand\u00e9).", 
- "success_url": "/accueil", 
+ "success_url": "/reservation",
  "title": "R\u00e9servation", 
  "web_form_fields": [
   {
