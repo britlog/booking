@@ -26,7 +26,7 @@ frappe.ready(function() {
 					$('[id="subscriptions"]').empty();
 					$('[id="subscriptions"]').append($('<option>').val('').text("{{ _("Pick a subscription") }}"));
 					(r.message || []).forEach(function(row){
-						$('[id="subscriptions"]').append($('<option>').val(row.name).text(row.name+" : "+row.start_date+" "+row.reference)
+						$('[id="subscriptions"]').append($('<option>').val(row.name).text(row.name+" : "+row.start_date+" "+(row.reference || ''))
 						.attr('subscribed_classes',row.subscribed_classes)
 						.attr('remaining_classes',row.remaining_classes)
 						.attr('end_date',row.end_date));
