@@ -96,7 +96,7 @@ def get_subscriptions(email_id):
 	return frappe.db.sql("""
 	select
 		BSU.name,
-		IFNULL(BSU.reference,''),
+		IFNULL(BSU.reference,'') AS reference,
 		BSU.subscribed_classes AS subscribed_classes,
 		BSU.remaining_classes AS remaining_classes,
 		DATE_FORMAT(BSU.start_date,%(str)s) AS start_date,
