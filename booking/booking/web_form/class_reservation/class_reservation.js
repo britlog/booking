@@ -39,7 +39,7 @@ frappe.ready(function() {
                 else {
                     available_message = row.available_places+" places disponibles";
                 }
-                $('[name="slot"]').append($('<option>').val(row.name).text(row.name+" | "+row.type.toUpperCase()+" | "+available_message)
+                $('[name="slot"]').append($('<option>').val(row.name).text((row.time_slot_display || row.name)+" | "+row.type.toUpperCase()+" | "+available_message)
                 .attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
                 .attr('class_type',row.type).attr('ignore_subscription',row.ignore_subscription));
 

@@ -3,11 +3,13 @@ TODO,Booking No,N° Réservation
 TODO,Remaining Classes,Cours Restants
 TODO,Subscribed Classes,Cours Souscrits
 TODO,Time Slot,Créneau Horaire
+TODO,Time Slot Display,Créneau
 TODO,Booking,Réservation
 TODO,Booking Slot,Créneau de Réservation
 TODO,Total Places,Places Totales
 TODO,Available Places,Places Disponibles
 TODO,Duration,Durée
+TODO,Location,Lieu
 TODO,Subscribers,Abonnés
 TODO,Subscriber,Abonné
 TODO,Receive Confirmation SMS,Recevoir un SMS de Confirmation
@@ -42,3 +44,5 @@ TODO,Expiry Email Sent,E-mail d'Expiration Envoyé
 TODO,Balance Email Sent,E-mail de Solde Envoyé
 TODO,Notify by Email on Booking with Comment Only,Notifier par Email une Réservation avec Commentaire Seulement
 TODO,You will receive an email only if the customer added a comment,Vous allez recevoir un mail seulement si le client a ajouté un commentaire
+TODO,Booking Location,Lieu
+TODO,Booking Coach,Coach

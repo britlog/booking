@@ -49,6 +49,16 @@ def get_data():
 					"name": "Booking Type",
 					"description": _("Booking Type."),
 				},
+				{
+					"type": "doctype",
+					"name": "Booking Location",
+					"description": _("Booking Location."),
+				},
+				{
+					"type": "doctype",
+					"name": "Booking Coach",
+					"description": _("Booking Coach."),
+				},
 			]
 		},
 	]

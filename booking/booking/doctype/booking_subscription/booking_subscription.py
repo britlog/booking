@@ -115,6 +115,7 @@ def get_classes(subscription_id):
 	return frappe.db.sql("""
 	select
 		BS.name AS slot,
+		BS.time_slot_display,
 		BS.type AS style,
 		BS.time_slot,
 		TBS.present,
@@ -126,6 +127,7 @@ def get_classes(subscription_id):
 	union ALL
 	select
 		BS.name AS slot,
+		BS.time_slot_display,
 		BS.type AS style,
 		BS.time_slot,
 		TBC.present,

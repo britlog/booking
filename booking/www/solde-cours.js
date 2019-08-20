@@ -80,8 +80,8 @@ frappe.ready(function() {
 						tableData+='</tr>';
 						(r.message || []).forEach(function(row){
 								tableData += '<tr>';
-								tableData += '<td>' + row.slot + '</td>';
-								tableData += '<td>' + row.style + '</td>';
+								tableData += '<td>' + (row.time_slot_display || row.slot) + '</td>';
+								tableData += '<td style="text-align: center;">' + row.style + '</td>';
 								tableData += '<td style="text-align: center;">' + row.booking_no + '</td>';
 								if (row.present)
 									tableData += '<td style="text-align: center;"><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
@@ -89,13 +89,13 @@ frappe.ready(function() {
 									tableData += '<td style="text-align: center;"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 
 								if (row.cancellation_date)
-									tableData += '<td>' + row.cancellation_date + '</td>';
+									tableData += '<td style="text-align: center;">' + row.cancellation_date + '</td>';
 								else {
 									var CurrentDate = new Date();
 									var TimeSlotDate = new Date(row.time_slot.replace(/\s/, 'T'));
 
 									if (TimeSlotDate > CurrentDate)
-										tableData += '<td style="padding: 5px;"><input class="btn btn-primary" type="button" id="'+ row.slot +'" \
+										tableData += '<td style="text-align: center;padding: 5px;"><input class="btn btn-primary" type="button" id="'+ row.slot +'" \
 												 value="Signaler une absence" onclick="cancel_class(this.id,\''+row.booking_no+'\');"></td>';
 								}
 								tableData += '</tr>';

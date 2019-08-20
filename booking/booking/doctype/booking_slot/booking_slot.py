@@ -11,8 +11,12 @@ from booking.booking.doctype.booking_subscription.booking_subscription import up
 
 class BookingSlot(Document):
 
-    def autoname(self):
-        self.name = frappe.utils.format_datetime(self.time_slot,"EEEE dd/MM/yyyy HH:mm").capitalize()
+    # def autoname(self):
+    #     location = " " + self.location if self.location else ""
+    #     self.name = frappe.utils.format_datetime(self.time_slot,"EEEE dd/MM/yyyy HH:mm").capitalize() + location
+
+    def before_insert(self):
+        self.time_slot_display = frappe.utils.format_datetime(self.time_slot,"EEEE dd/MM/yyyy HH:mm").capitalize()
 
     def validate(self):
         trigger_notification(self)
