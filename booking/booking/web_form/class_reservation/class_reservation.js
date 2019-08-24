@@ -13,41 +13,63 @@ frappe.ready(function() {
         }
     });
 
+	// load activities
+	$('[name="type"]').empty();
+	$('[name="type"]').append($('<option>').val('').text('- Toutes -'));
+	frappe.call({
+			method: 'booking.booking.web_form.class_reservation.class_reservation.get_activities',
+			args: {},
+			callback: function(r) {
+//				console.log(r.message);
+
+				(r.message || []).forEach(function(row){
+					$('[name="type"]').append($('<option>').val(row).text(row));
+				});
+
+			}
+		});
+
     // load slots
-    $('[name="slot"]').empty()
-    $('[name="slot"]').append($('<option>').val('').text(''));
-    $('[name="slot"]').after($('<input class="btn btn-primary" type="button" id="notification-button" value="S\'inscrire sur la liste d\'attente">'));
+    $('[name="email_id"]').after($('<br><input class="btn btn-primary" type="button" id="notification-button" value="S\'inscrire sur la liste d\'attente">'));
     //$("#notification-button").prop("disabled",true);
     $("#notification-button").toggle(false);	//hide button
 
-    frappe.call({
-        method: 'booking.booking.web_form.class_reservation.class_reservation.get_slot',
-        args: {
-            //'type': 'Vinyasa'
-        },
-        callback: function(r) {
-            //console.log(r.message);
-            var options = [];
-            var available_message = "";
-            (r.message || []).forEach(function(row){
-                if (row.available_places <= 0) {
-                    available_message = "Liste d'attente";
-                }
-                else if (row.available_places == 1) {
-                    available_message = "1 place disponible";
-                }
-                else {
-                    available_message = row.available_places+" places disponibles";
-                }
-                $('[name="slot"]').append($('<option>').val(row.name).text((row.time_slot_display || row.name)+" | "+row.type.toUpperCase()+" | "+available_message)
-                .attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
-                .attr('class_type',row.type).attr('ignore_subscription',row.ignore_subscription));
+    get_slots("");
 
-//                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
-            });
+	function get_slots(activity) {
 
-        }
-    });
+		$('[name="slot"]').empty();
+    	$('[name="slot"]').append($('<option>').val('').text(''));
+
+		frappe.call({
+			method: 'booking.booking.web_form.class_reservation.class_reservation.get_slots',
+			args: {
+				'activity': activity
+			},
+			callback: function(r) {
+//				console.log(r.message);
+				var available_message = "";
+				(r.message || []).forEach(function(row){
+					if (row.available_places <= 0) {
+						available_message = "Liste d'attente";
+					}
+					else if (row.available_places == 1) {
+						available_message = "1 place disponible";
+					}
+					else {
+						available_message = row.available_places+" places disponibles";
+					}
+
+					$('[name="slot"]').append($('<option>').val(row.name).text((row.time_slot_display || row.name)+" | "+((activity) ? '' : row.type.toUpperCase()+" | ")+available_message)
+					.attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
+					.attr('class_type',row.type).attr('ignore_subscription',row.ignore_subscription));
+
+	//                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
+				});
+
+			}
+		});
+    }
 
     function valid_email_fr(id) {
 	    return (id.toLowerCase().search("^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")==-1) ? 0 : 1;
@@ -64,17 +86,26 @@ frappe.ready(function() {
 
           $("#notification-button").prop("disabled",false);
 
-          if ($("select option:selected").attr('available_places') <= 0) {
+//		  console.log($('[name="slot"] :selected').attr('available_places'));
+          if ($('[name="slot"] :selected').attr('available_places') <= 0) {
             $("#notification-button").toggle(true);		//show button
           }
           else {
             $("#notification-button").toggle(false);	//hide button
           }
 
-		  if ($("select option:selected").attr('subscription_places') <= 0) {
+		  if ($('[name="slot"] :selected').attr('subscription_places') <= 0) {
 		  	frappe.msgprint("Le groupe est complet, cours à la séance uniquement.");
 		  }
 
+     })
+
+	$('[name="type"]').change(function () {
+
+//		  frappe.msgprint($('[name="type"]').val());
+//		  $('[name="slot"]').val($('[name="slot"] option:first').val());
+		  $("#notification-button").toggle(false);	//hide button
+		  get_slots($('[name="type"]').val());
 
      })
 
@@ -139,7 +170,7 @@ frappe.ready(function() {
 		}
 
 		// Check if catch up class is allowed or display a warning message
-		var class_type = $("select option:selected").attr('class_type') || '';
+		var class_type = $('[name="slot"] :selected').attr('class_type') || '';
 		frappe.call({
             method: 'booking.booking.doctype.booking.booking.get_subscriptions',
             args: {
@@ -150,7 +181,7 @@ frappe.ready(function() {
                 //console.log(r.message);
                 var bCancel = false
 
-				if (r.message && !parseInt($("select option:selected").attr('ignore_subscription'))) {
+				if (r.message && !parseInt($('[name="slot"] :selected').attr('ignore_subscription'))) {
 					// At least 1 subscription found for this email id
 					if (r.message[0].customer && !r.message[0].subscription) {
 						// But no more catch up classes or outside subscription type

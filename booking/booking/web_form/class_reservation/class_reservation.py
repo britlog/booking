@@ -22,13 +22,30 @@ def get_introduction():
 	return frappe.db.get_single_value('Booking Settings', 'booking_form_introduction')
 
 @frappe.whitelist(allow_guest=True)
-def get_slot():
+def get_activities():
 
-	slots = frappe.get_all("Booking Slot",
-		fields=["name","time_slot_display","type","available_places","total_places","ignore_subscription"],
-		filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
-				 ["Booking Slot", "show_in_website", "=", 1]],
-		order_by="time_slot asc")
+	return frappe.db.sql("""
+		select	distinct BS.type 
+		from `tabBooking Slot` BS
+		where time_slot > NOW() and show_in_website = 1""")
+
+@frappe.whitelist(allow_guest=True)
+def get_slots(activity):
+
+	if activity:
+		slots = frappe.get_all("Booking Slot",
+			fields=["name","time_slot_display","type","available_places","total_places","ignore_subscription"],
+			filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
+					 ["Booking Slot", "show_in_website", "=", 1],
+					 ["Booking Slot", "type", "=", activity]],
+			order_by="time_slot asc")
+	else:
+		slots = frappe.get_all("Booking Slot",
+		   fields=["name", "time_slot_display", "type", "available_places", "total_places",
+				   "ignore_subscription"],
+		   filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
+					["Booking Slot", "show_in_website", "=", 1]],
+		   order_by="time_slot asc")
 
 	for slot in slots:
 		slot['subscription_places'] = slot.get('total_places') \

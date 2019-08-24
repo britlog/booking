@@ -18,7 +18,7 @@
  "is_standard": 1, 
  "login_required": 0, 
  "max_attachment_size": 0, 
- "modified": "2019-08-13 23:57:42.510878",
+ "modified": "2019-08-22 23:50:35.904822", 
  "modified_by": "Administrator", 
  "module": "Booking", 
  "name": "class-reservation", 
@@ -29,9 +29,20 @@
  "show_sidebar": 0, 
  "sidebar_items": [], 
  "success_message": "Merci pour la r\u00e9servation.\nVous allez recevoir une confirmation par e-mail (et SMS si demand\u00e9).", 
- "success_url": "/reservation",
+ "success_url": "/reservation", 
  "title": "R\u00e9servation", 
  "web_form_fields": [
+  {
+   "fieldname": "type", 
+   "fieldtype": "Select", 
+   "hidden": 0, 
+   "label": "Activit\u00e9", 
+   "max_length": 0, 
+   "max_value": 0, 
+   "options": "", 
+   "read_only": 0, 
+   "reqd": 0
+  }, 
   {
    "fieldname": "slot", 
    "fieldtype": "Select", 
@@ -40,6 +51,16 @@
    "max_length": 0, 
    "max_value": 0, 
    "options": "", 
+   "read_only": 0, 
+   "reqd": 1
+  }, 
+  {
+   "fieldname": "full_name", 
+   "fieldtype": "Data", 
+   "hidden": 0, 
+   "label": "Nom", 
+   "max_length": 0, 
+   "max_value": 0, 
    "read_only": 0, 
    "reqd": 1
   }, 
@@ -53,6 +74,14 @@
    "options": "Email", 
    "read_only": 0, 
    "reqd": 1
+  }, 
+  {
+   "fieldtype": "Column Break", 
+   "hidden": 0, 
+   "max_length": 0, 
+   "max_value": 0, 
+   "read_only": 0, 
+   "reqd": 0
   }, 
   {
    "fieldname": "city", 
@@ -76,39 +105,21 @@
    "reqd": 0
   }, 
   {
-   "fieldtype": "Column Break", 
+   "description": "Une confirmation est syst\u00e9matiquement envoy\u00e9e par e-mail.", 
+   "fieldname": "confirm_sms", 
+   "fieldtype": "Check", 
    "hidden": 0, 
+   "label": "Recevoir un SMS de confirmation", 
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
    "reqd": 0
-  }, 
-  {
-   "fieldname": "full_name", 
-   "fieldtype": "Data", 
-   "hidden": 0, 
-   "label": "Nom", 
-   "max_length": 0, 
-   "max_value": 0, 
-   "read_only": 0, 
-   "reqd": 1
   }, 
   {
    "fieldname": "comment", 
    "fieldtype": "Small Text", 
    "hidden": 0, 
    "label": "Commentaire", 
-   "max_length": 0, 
-   "max_value": 0, 
-   "read_only": 0, 
-   "reqd": 0
-  }, 
-  {
-   "description": "Une confirmation est syst\u00e9matiquement envoy\u00e9e par e-mail.", 
-   "fieldname": "confirm_sms", 
-   "fieldtype": "Check", 
-   "hidden": 0, 
-   "label": "Recevoir un SMS de confirmation", 
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
