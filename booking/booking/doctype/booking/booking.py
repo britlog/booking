@@ -72,7 +72,7 @@ class Booking(Document):
 				_("Nouvelle réservation n°"),
 				self.name,
 				_("pour le"),
-				self.slot,
+				frappe.db.get_value("Booking Slot", self.slot, "time_slot_display"),
 				_("Nom"),
 				self.full_name,
 				_("Commentaire"),
