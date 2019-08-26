@@ -61,8 +61,7 @@ frappe.ready(function() {
 					}
 
 					$('[name="slot"]').append($('<option>').val(row.name).text((row.time_slot_display || row.name)+" | "+((activity) ? '' : row.type.toUpperCase()+" | ")+available_message)
-					.attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
-					.attr('class_type',row.type).attr('ignore_subscription',row.ignore_subscription));
+					.attr('available_places',row.available_places).attr('subscription_places',row.subscription_places));
 
 	//                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
 				});
@@ -170,24 +169,20 @@ frappe.ready(function() {
 		}
 
 		// Check if catch up class is allowed or display a warning message
-		var class_type = $('[name="slot"] :selected').attr('class_type') || '';
 		frappe.call({
-            method: 'booking.booking.doctype.booking.booking.get_subscriptions',
+            method: 'booking.booking.doctype.booking.booking.get_slot_subscription',
             args: {
                 'email_id': email,
-                'class_type': class_type
+                'slot_id': $('[name="slot"]').val()
             },
             callback: function(r) {
-                //console.log(r.message);
+//                console.log(r.message);
                 var bCancel = false
 
-				if (r.message && !parseInt($('[name="slot"] :selected').attr('ignore_subscription'))) {
-					// At least 1 subscription found for this email id
-					if (r.message[0].customer && !r.message[0].subscription) {
-						// But no more catch up classes or outside subscription type
-						if (!confirm('Cours hors abonnement, souhaitez-vous valider la réservation ?')) {
-							bCancel = true;
-						}
+				if (r.message && !r.message.is_valid) {
+					// subscription is not valid, display a warning
+					if (!confirm(r.message.warning_msg)) {
+						bCancel = true;
 					}
 				}
 

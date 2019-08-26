@@ -18,13 +18,13 @@ class Booking(Document):
 		doc.available_places -= 1
 
 		# insert new booking class into child table
-		subscriptions = get_subscriptions(self.email_id, doc.type)
+		subscription = get_slot_subscription(self.email_id, self.slot)
 
 		doc.append("bookings", {
 			"full_name": self.full_name,
 			"booking": self.name,
-			"subscriber": subscriptions[0]["customer"] if subscriptions else "",
-			"subscription": subscriptions[0]["subscription"] if len(subscriptions) == 1 else ""
+			"subscriber": subscription["customer"] if subscription else "",
+			"subscription": subscription["subscription"] if subscription and subscription["is_valid"] else ""
 		})
 
 		# save document to the database
@@ -97,19 +97,6 @@ class Booking(Document):
 				frappe.log_error(frappe.get_traceback(),'email to company failed')  # Otherwise, booking is not registered in database if errors
 
 
-	# def on_trash(self):
-	# 	doc = frappe.get_doc("Booking Slot", self.slot)
-	#
-	# 	# add available place if this booking was not already cancelled
-	# 	if not self.cancellation_date:
-	# 		doc.available_places += 1
-	#
-	# 	# save a document to the database
-	# 	doc.save()
-
-	# def on_update(self):
-	# 	update_available_places(self.slot)
-
 	def before_insert(self):
 
 		# check if already registered
@@ -142,17 +129,11 @@ class Booking(Document):
 		# manage trial class
 		self.trial_class = is_trial_class(self.email_id, doc.type)
 
-
-# def update_available_places(slot):
-# 	doc = frappe.get_doc("Booking Slot", slot)
-#
-# 	doc.available_places = doc.total_places \
-# 		- frappe.db.sql("""select COUNT(*) from `tabBooking Class` where parent = %(slot)s and cancellation_date is null""",
-# 		{"slot": slot})[0][0] \
-# 		- frappe.db.sql("""select COUNT(*) from `tabBooking Subscriber` where parent = %(slot)s and cancellation_date is null""",
-# 		{"slot": slot})[0][0]
-#
-# 	doc.save()
+		# error if guest booking is not allowed
+		if not self.trial_class and frappe.db.get_single_value('Booking Settings', 'disable_guest_booking'):
+			subscription = get_slot_subscription(self.email_id, self.slot)
+			if not subscription or not subscription["is_valid"]:
+				frappe.throw(frappe.db.get_single_value('Booking Settings', 'guest_booking_message'))
 
 
 def is_trial_class(email, class_type):
@@ -170,25 +151,36 @@ def is_trial_class(email, class_type):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_subscriptions(email_id, class_type):
+def get_slot_subscription(email_id, slot_id):
 
-	subscriptions = frappe.db.sql("""
-		select	C.name as customer, 
-			    BSU.name as subscription,
-			    BSU.remaining_catch_up
-		from `tabBooking Subscription` BSU
-		inner join `tabCustomer` C on BSU.customer = C.name
-		inner join `tabDynamic Link` DL on C.name = DL.link_name
-		inner join `tabContact` CT on DL.parent = CT.name
-		where CT.email_id = %(email)s and BSU.remaining_classes > 0 and BSU.disabled = 0
-		order by BSU.remaining_catch_up DESC""",
-		{"email": email_id}, as_dict=True)
+	subscription = {}
 
-	if subscriptions:
-		if frappe.db.get_single_value('Booking Settings', 'enable_catch_up') and not subscriptions[0]["remaining_catch_up"] :
-			subscriptions[0]["subscription"] = ""
+	if not frappe.get_value("Booking Slot", slot_id, 'ignore_subscription'):
+		subscriptions = frappe.db.sql("""
+			select	C.name as customer, 
+					BSU.name as subscription,
+					BSU.remaining_catch_up
+			from `tabBooking Subscription` BSU
+			inner join `tabCustomer` C on BSU.customer = C.name
+			inner join `tabDynamic Link` DL on C.name = DL.link_name
+			inner join `tabContact` CT on DL.parent = CT.name
+			where CT.email_id = %(email)s and BSU.remaining_classes > 0 and BSU.end_date > NOW() and BSU.disabled = 0
+			order by BSU.remaining_catch_up DESC""",
+			{"email": email_id}, as_dict=True)
 
-		if frappe.get_value("Booking Type", class_type, 'outside_subscription'):
-			subscriptions[0]["subscription"] = ""
+		if subscriptions:
+			subscription = subscriptions[0]
+			subscription["is_valid"] = True
+			subscription["warning_msg"] = ""
 
-	return subscriptions
+			enable_catch_up = frappe.db.get_single_value('Booking Settings', 'enable_catch_up')
+			if enable_catch_up and subscription["remaining_catch_up"] <= 0:
+				subscription["is_valid"] = False
+				subscription["warning_msg"] = "Cours hors rattrapage, souhaitez-vous valider la réservation ?"
+
+			activity = frappe.get_value("Booking Slot", slot_id, 'type')
+			if frappe.get_value("Booking Type", activity, 'outside_subscription'):
+				subscription["is_valid"] = False
+				subscription["warning_msg"] = "Cours hors abonnement, souhaitez-vous valider la réservation ?"
+
+	return subscription
