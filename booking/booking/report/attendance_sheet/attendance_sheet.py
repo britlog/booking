@@ -14,7 +14,8 @@ def execute(filters=None):
 	data = get_subscribers(filters.get("slot"))
 	data += get_bookings(filters.get("slot"))
 
-	return columns, data
+	return columns, data, [ ], [ ], [frappe.db.get_value("Booking Slot", filters.get("slot"), "time_slot_display"),\
+		   frappe.db.get_value("Booking Slot", filters.get("slot"), "type")]
 
 def get_columns(filters):
 	columns = [

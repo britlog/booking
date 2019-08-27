@@ -130,7 +130,8 @@ class Booking(Document):
 		self.trial_class = is_trial_class(self.email_id, doc.type)
 
 		# error if guest booking is not allowed
-		if not self.trial_class and frappe.db.get_single_value('Booking Settings', 'disable_guest_booking'):
+		if not self.trial_class and frappe.db.get_single_value('Booking Settings', 'disable_guest_booking') \
+		and not frappe.get_value("Booking Slot", self.slot, 'ignore_subscription'):
 			subscription = get_slot_subscription(self.email_id, self.slot)
 			if not subscription or not subscription["is_valid"]:
 				frappe.throw(frappe.db.get_single_value('Booking Settings', 'guest_booking_message'))

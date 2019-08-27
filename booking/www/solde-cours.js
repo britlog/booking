@@ -73,7 +73,7 @@ frappe.ready(function() {
 
 						var tableData = '<tr>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;">Historique des cours</th>'
-						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;">Style</th>'
+						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;">Activité</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Réservation</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Présence</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Annulation</th>'
