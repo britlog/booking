@@ -124,11 +124,11 @@ frappe.ready(function() {
 		}
 
 		if(email != email_confirm) {
-			frappe.msgprint(__("L'email de vérification est différent de l'email"));
+			frappe.msgprint(__("Veuillez contrôler votre adresse e-mail : les champs E-mail et Confirmation E-mail sont différents."));
             $('[name="email_confirm"]').focus();
             return false;
 		}
-		
+
 		if (!fullname) {
             frappe.msgprint(__("Entrez s'il vous plaît votre nom."));
             $('[name="full_name"]').focus();
@@ -169,7 +169,7 @@ frappe.ready(function() {
 		}
 
 		if(email != email_confirm) {
-			frappe.msgprint(__("L'email de vérification est différent de l'email"));
+			frappe.msgprint(__("Veuillez contrôler votre adresse e-mail : les champs E-mail et Confirmation E-mail sont différents."));
             $('[name="email_confirm"]').focus();
             return false;
 		}
