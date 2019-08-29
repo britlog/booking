@@ -49,5 +49,5 @@ TODO,Booking Coach,Coach
 TODO,Disable Guest Booking,Désactiver Réservation Invité
 TODO,Only for trial classes and subscribers.,Seulement pour les cours d'essai et les abonnés.
 TODO,Guest Booking Message,Message Réservation Invité
-TODO,Auto Attendance,Présence Auto
+TODO,Enable Auto Attendance,Activer Présence Auto
 TODO,Automatically validate subscriber's presence if class not cancelled,Valide automatiquement la présence de l'abonné si cours non annulé
