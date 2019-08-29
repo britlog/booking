@@ -33,6 +33,22 @@ def update_subscriptions(slot=None):
 			fields=['name'])
 
 	else:
+		# update presence first
+		if frappe.db.get_single_value('Booking Settings', 'auto_attendance'):
+			frappe.db.sql("""
+				UPDATE `tabBooking Subscriber` BSU INNER JOIN `tabBooking Slot` BSL ON BSU.parent = BSL.name
+				SET BSU.present = 1
+				WHERE BSU.subscription IS NOT NULL AND BSU.cancellation_date IS NULL AND BSU.present = 0
+					AND BSL.time_slot < NOW()""")
+
+			frappe.db.sql("""
+				UPDATE `tabBooking Class` BCL INNER JOIN `tabBooking Slot` BSL ON BCL.parent = BSL.name
+				SET BCL.present = 1
+				WHERE BCL.subscription IS NOT NULL AND BCL.cancellation_date IS NULL AND BCL.present = 0
+					AND BSL.time_slot < NOW()""")
+
+			frappe.db.commit()
+
 		# get all active subscriptions
 		subscriptions = frappe.get_all("Booking Subscription",
 			filters=[["disabled", "=", 0]],

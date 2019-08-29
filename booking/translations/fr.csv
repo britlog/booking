@@ -42,10 +42,12 @@ TODO,A warning will be displayed to subscribers while booking,Un avertissement s
 TODO,Ignore Subscription,Ignorer Abonnement
 TODO,Expiry Email Sent,E-mail d'Expiration Envoyé
 TODO,Balance Email Sent,E-mail de Solde Envoyé
-TODO,Notify by Email on Booking with Comment Only,Notifier par Email une Réservation avec Commentaire Seulement
+TODO,Notify by Email Only if Comment,Notifier par Email si Commentaire Seulement
 TODO,You will receive an email only if the customer added a comment,Vous allez recevoir un mail seulement si le client a ajouté un commentaire
 TODO,Booking Location,Lieu
 TODO,Booking Coach,Coach
 TODO,Disable Guest Booking,Désactiver Réservation Invité
 TODO,Only for trial classes and subscribers.,Seulement pour les cours d'essai et les abonnés.
 TODO,Guest Booking Message,Message Réservation Invité
+TODO,Auto Attendance,Présence Auto
+TODO,Automatically validate subscriber's presence if class not cancelled,Valide automatiquement la présence de l'abonné si cours non annulé
