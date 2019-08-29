@@ -27,7 +27,8 @@ def get_activities():
 	return frappe.db.sql("""
 		select	distinct BS.type 
 		from `tabBooking Slot` BS
-		where time_slot > NOW() and show_in_website = 1""")
+		where time_slot > NOW() and show_in_website = 1
+		order by BS.type""")
 
 @frappe.whitelist(allow_guest=True)
 def get_slots(activity):

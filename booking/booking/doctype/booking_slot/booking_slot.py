@@ -16,7 +16,9 @@ class BookingSlot(Document):
     #     self.name = frappe.utils.format_datetime(self.time_slot,"EEEE dd/MM/yyyy HH:mm").capitalize() + location
 
     def validate(self):
-        self.time_slot_display = frappe.utils.format_datetime(self.time_slot, "EEEE dd/MM/yyyy HH:mm").capitalize()
+        if frappe.session['user'] != 'Guest':
+            self.time_slot_display = frappe.utils.format_datetime(self.time_slot, "EEEE dd/MM/yyyy HH:mm").capitalize()
+
         trigger_notification(self)
 
     def on_update(self):
