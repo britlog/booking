@@ -1,0 +1,161 @@
+{% extends "templates/web.html" %}
+
+{% block title %} {{_("Réservation | Santani Yoga")}} {% endblock %}
+
+{% block page_content %}
+<div class="page-content-wrapper">
+	<div class="row page-head">
+		<div class='col-sm-12'>
+			<div class="page-breadcrumbs">
+			</div>
+		</div>
+		<div class="col-sm-8 col-xs-6">
+			<h1>Réservation</h1>
+		</div>
+		<div class="col-sm-4 col-xs-6">
+			<div class="page-header-actions-block">
+				<div style="padding-bottom: 15px;">
+					<button type="submit" class="btn btn-primary btn-sm btn-form-submit">Envoyer</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="page_content">
+		<div class="introduction">
+			<p class="text-muted"><b>Formulaire non compatible avec Internet Explorer.</b>
+			<br>Merci d'utiliser un autre navigateur : Mozilla Firefox, Google Chrome, Microsoft Edge, Opera, Safari etc.
+			<br><br><a href="https://www.mozilla.org/fr/firefox/download/thanks/" target="_blank">
+				Cliquez ici pour télécharger Mozilla Firefox</a></p>
+		</div>
+		<hr>
+		<br>
+
+		<form role="form">
+
+			<div class="web-form-page"
+				data-idx="1"
+				data-label="Page 1">
+
+				<div class="section">
+					<div class="row">
+							<div class="col-sm-6">
+
+								<div class="form-group">
+									<label for="type" class="control-label text-muted small">Activité</label>
+
+									<select class="form-control" name="type" data-fieldname="type"
+									data-label="Activité" data-fieldtype="Select"
+									data-doctype="Booking" data-default="">
+										<option value="" selected="selected"></option>
+									</select>
+								</div>
+
+								<div class="form-group has-error">
+									<label for="slot" class="control-label text-muted small">Cours</label>
+
+									<select class="form-control" name="slot" data-fieldname="slot"
+									data-label="Cours" data-fieldtype="Select"
+									data-doctype="Booking" data-default=""
+									data-reqd=1>
+										<option value="" selected="selected"></option>
+									</select>
+
+								</div>
+
+								<div class="form-group has-error">
+									<label for="full_name" class="control-label text-muted small">Nom</label>
+
+									<input type=text class="form-control" name="full_name" data-fieldname="full_name"
+									data-label="Nom" data-fieldtype="Data"
+									data-doctype="Booking" data-default=""
+									data-reqd=1 value="">
+
+								</div>
+
+								<div class="form-group has-error">
+									<label for="email_id" class="control-label text-muted small">E-mail</label>
+
+									<input type=text class="form-control" name="email_id" data-fieldname="email_id"
+									data-label="E-mail" data-fieldtype="Data"
+									data-doctype="Booking" data-default=""
+									data-reqd=1 value="">
+
+								</div>
+
+								<div class="form-group has-error">
+									<label for="email_confirm" class="control-label text-muted small">Confirmation E-mail</label>
+
+									<input class="form-control" type="email" name="email_confirm"
+										   oncopy="return false" onpaste="return false" oncut="return false">
+								</div>
+
+								<div class="form-group has-error">
+									<input class="btn btn-primary" type="button" id="notification-button"
+										   value="S'inscrire sur la liste d'attente" style="display: none;">
+								</div>
+							</div>
+
+							<div class="col-sm-6">
+
+								<div class="form-group">
+									<label for="city" class="control-label text-muted small">Ville</label>
+
+									<input type=text class="form-control" name="city" data-fieldname="city"
+										   data-label="Ville" data-fieldtype="Data" data-doctype="Booking" data-default=""
+										   value="">
+								</div>
+
+								<div class="form-group">
+									<label for="phone" class="control-label text-muted small">Téléphone</label>
+
+									<input type=text class="form-control" name="phone" data-fieldname="phone"
+									data-label="Téléphone" data-fieldtype="Data"
+									data-doctype="Booking" data-default=""
+										value="">
+								</div>
+
+								<div class="form-group">
+									<div class="checkbox">
+										<label class='text-muted small'>
+											<input type="checkbox" id="confirm_sms"
+												   name="confirm_sms" data-fieldname="confirm_sms"
+												   data-label="Recevoir un SMS de confirmation" data-fieldtype="Check"
+												   data-doctype="Booking" data-default=""
+												   name="confirm_sms" data-doctype="Booking">
+												Recevoir un SMS de confirmation
+										</label>
+
+										<span class="help-block small text-muted">Une confirmation est systématiquement envoyée par e-mail.</span>
+									</div>
+								</div>
+
+								<div class="form-group">
+
+									<label for="comment" class="control-label text-muted small">Commentaire</label>
+
+									<textarea class="form-control" style="height: 150px" name="comment" data-fieldname="comment"
+									data-label="Commentaire" data-fieldtype="Small Text"
+									data-doctype="Booking" data-default=""></textarea>
+								</div>
+
+							</div>
+
+					</div>
+				</div>
+
+
+				<!-- page footer buttons -->
+				<div>
+					<br>
+					<p class='text-right'><!-- save/next button -->
+
+						<button type="submit" class="btn btn-primary btn-sm btn-form-submit">Envoyer</button>
+					</p>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+{% endblock %}

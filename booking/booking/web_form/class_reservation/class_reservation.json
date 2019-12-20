@@ -18,14 +18,15 @@
  "is_standard": 1, 
  "login_required": 0, 
  "max_attachment_size": 0, 
- "modified": "2019-09-11 22:18:45.364506", 
- "modified_by": "Administrator", 
+ "modified": "2019-12-20 00:49:38.516638", 
+ "modified_by": "info@britlog.com", 
  "module": "Booking", 
  "name": "class-reservation", 
  "owner": "Administrator", 
  "payment_button_label": "Buy Now", 
  "published": 1, 
- "route": "reservation", 
+ "route": "class-reservation", 
+ "show_in_grid": 0, 
  "show_sidebar": 0, 
  "sidebar_items": [], 
  "success_message": "Merci pour la r\u00e9servation.\nVous allez recevoir une confirmation par e-mail (et SMS si demand\u00e9).", 
@@ -33,6 +34,7 @@
  "title": "R\u00e9servation", 
  "web_form_fields": [
   {
+   "allow_read_on_all_link_options": 0, 
    "fieldname": "type", 
    "fieldtype": "Select", 
    "hidden": 0, 
@@ -41,9 +43,11 @@
    "max_value": 0, 
    "options": "", 
    "read_only": 0, 
-   "reqd": 0
+   "reqd": 0, 
+   "show_in_filter": 0
   }, 
   {
+   "allow_read_on_all_link_options": 0, 
    "fieldname": "slot", 
    "fieldtype": "Select", 
    "hidden": 0, 
@@ -52,9 +56,11 @@
    "max_value": 0, 
    "options": "", 
    "read_only": 0, 
-   "reqd": 1
+   "reqd": 1, 
+   "show_in_filter": 0
   }, 
   {
+   "allow_read_on_all_link_options": 0, 
    "fieldname": "full_name", 
    "fieldtype": "Data", 
    "hidden": 0, 
@@ -62,9 +68,11 @@
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
-   "reqd": 1
+   "reqd": 1, 
+   "show_in_filter": 0
   }, 
   {
+   "allow_read_on_all_link_options": 0, 
    "fieldname": "email_id", 
    "fieldtype": "Data", 
    "hidden": 0, 
@@ -73,17 +81,21 @@
    "max_value": 0, 
    "options": "Email", 
    "read_only": 0, 
-   "reqd": 1
+   "reqd": 1, 
+   "show_in_filter": 0
   }, 
   {
+   "allow_read_on_all_link_options": 0, 
    "fieldtype": "Column Break", 
    "hidden": 0, 
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
-   "reqd": 0
+   "reqd": 0, 
+   "show_in_filter": 0
   }, 
   {
+   "allow_read_on_all_link_options": 0, 
    "fieldname": "city", 
    "fieldtype": "Data", 
    "hidden": 0, 
@@ -91,9 +103,11 @@
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
-   "reqd": 0
+   "reqd": 0, 
+   "show_in_filter": 0
   }, 
   {
+   "allow_read_on_all_link_options": 0, 
    "description": "", 
    "fieldname": "phone", 
    "fieldtype": "Data", 
@@ -102,9 +116,11 @@
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
-   "reqd": 0
+   "reqd": 0, 
+   "show_in_filter": 0
   }, 
   {
+   "allow_read_on_all_link_options": 0, 
    "description": "Une confirmation est syst\u00e9matiquement envoy\u00e9e par e-mail.", 
    "fieldname": "confirm_sms", 
    "fieldtype": "Check", 
@@ -113,9 +129,11 @@
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
-   "reqd": 0
+   "reqd": 0, 
+   "show_in_filter": 0
   }, 
   {
+   "allow_read_on_all_link_options": 0, 
    "fieldname": "comment", 
    "fieldtype": "Small Text", 
    "hidden": 0, 
@@ -123,7 +141,8 @@
    "max_length": 0, 
    "max_value": 0, 
    "read_only": 0, 
-   "reqd": 0
+   "reqd": 0, 
+   "show_in_filter": 0
   }
  ]
 }
