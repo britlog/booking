@@ -218,7 +218,7 @@ frappe.ready(function() {
 							'name': fullname,
 							'city': city,
 							'phone': phone,
-							'sms': +sms,	//convert to int with Unary plus operator
+							'sms': sms,
 							'comment': comment
 						},
 						callback: function(r) {
