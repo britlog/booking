@@ -37,7 +37,7 @@ def send_notification_email():
 	if notifications:
 
 		waiting_list_notification = frappe.db.get_single_value('Booking Settings', 'waiting_list_notification')
-		email_template = frappe.get_doc("Standard Reply", waiting_list_notification)
+		email_template = frappe.get_doc("Email Template", waiting_list_notification)
 
 		for notification in notifications:
 
