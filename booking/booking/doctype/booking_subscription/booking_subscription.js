@@ -27,6 +27,6 @@ frappe.ui.form.on('Booking Subscription', "subscribed_classes", function(frm) {
     });
 });
 
-frappe.ui.form.on('Booking Subscription', "customer", function(frm) {
-    frm.add_fetch('customer','email_id','email_id');
-});
+//frappe.ui.form.on('Booking Subscription', "customer", function(frm) {
+//    frm.add_fetch('customer','email_id','email_id');
+//});

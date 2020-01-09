@@ -6,6 +6,12 @@ frappe.ready(function() {
 	});
 
 	$("#update").click(function() {
+
+		//init
+		$('[id="subscriptions"]').toggle(false);
+		$('#matable').toggle(false);
+		$("#contact-alert").toggle(false);
+
 		var args = {
 			email_id : $("#customer_id").val()
 		}
@@ -19,8 +25,8 @@ frappe.ready(function() {
 			method: 'booking.booking.doctype.booking_subscription.booking_subscription.get_subscriptions',
 			args: args,
 			callback: function(r) {
-				//console.log(r.message);
-				if (r.message) {
+				console.log(r.message);
+				if (!jQuery.isEmptyObject(r.message)) {
 					$("#contact-alert").toggle(false);
 					$('[id="subscriptions"]').toggle(true);
 					$('[id="subscriptions"]').empty();
@@ -34,7 +40,6 @@ frappe.ready(function() {
 				}
 				else {
 					msgprint("Aucun abonnement trouvé avec cette adresse e-mail");
-					$('[id="subscriptions"]').toggle(false);
 				}
 
 				if(r.exc) {
@@ -59,7 +64,7 @@ frappe.ready(function() {
 			else validity_date = " jusqu'au "+validity_date;
 
 			//frappe.msgprint("Il vous reste "+num.toString()+" cours");
-			msgprint("Il vous reste "+remaining_classes.toString()+" cours (sur "+subscribed_classes+")"+validity_date);
+			msgprint_alert("Il vous reste "+remaining_classes.toString()+" cours (sur "+subscribed_classes+")"+validity_date);
 
 			//print detail classes table
 			frappe.call({
