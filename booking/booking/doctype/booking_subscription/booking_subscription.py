@@ -72,13 +72,13 @@ def get_remaining_classes(subscribed_classes, subscription):
 		subscribed_classes=0
 
 	classes = int(subscribed_classes) \
-		- frappe.db.sql("""select SUM(BTP.class_coefficient) 
+		- frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
 			from `tabBooking Subscriber` BSU
 			inner join `tabBooking Slot` BSL ON BSU.parent = BSL.name
 			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
 			where BSU.subscription = %(subscription)s and BSU.present = 1""",
 			{"subscription": subscription})[0][0] \
-		- frappe.db.sql("""select SUM(BTP.class_coefficient) 
+		- frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
 			from `tabBooking Class` BCL
 			inner join `tabBooking Slot` BSL ON BCL.parent = BSL.name
 			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
