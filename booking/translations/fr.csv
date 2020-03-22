@@ -51,3 +51,5 @@ TODO,Only for trial classes and subscribers.,Seulement pour les cours d'essai et
 TODO,Guest Booking Message,Message Réservation Invité
 TODO,Enable Auto Attendance,Activer Présence Auto
 TODO,Automatically validate subscriber's presence if class not cancelled,Valide automatiquement la présence de l'abonné si cours non annulé
+TODO,Class Coefficient,Coefficient du Cours
+TODO,Subscription charge per class,Valeur décomptée de l'abonnement par cours

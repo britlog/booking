@@ -88,8 +88,12 @@ frappe.ready(function() {
 								tableData += '<td>' + (row.time_slot_display || row.slot) + '</td>';
 								tableData += '<td style="text-align: center;">' + row.style + '</td>';
 								tableData += '<td style="text-align: center;">' + row.booking_no + '</td>';
-								if (row.present)
-									tableData += '<td style="text-align: center;"><i class="fa fa-check-square-o" aria-hidden="true"></i></td>';
+								if (row.present) {
+									tableData += '<td style="text-align: center;"><i class="fa fa-check-square-o" aria-hidden="true"></i>';
+									if (row.class_coefficient != 1)
+										tableData += ' / ' + row.class_coefficient
+									tableData += '</td>';
+								}
 								else
 									tableData += '<td style="text-align: center;"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 

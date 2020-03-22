@@ -72,11 +72,17 @@ def get_remaining_classes(subscribed_classes, subscription):
 		subscribed_classes=0
 
 	classes = int(subscribed_classes) \
-		- frappe.db.sql("""select COUNT(*) from `tabBooking Subscriber`
-			where subscription = %(subscription)s and present = 1""",
+		- frappe.db.sql("""select SUM(BTP.class_coefficient) 
+			from `tabBooking Subscriber` BSU
+			inner join `tabBooking Slot` BSL ON BSU.parent = BSL.name
+			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
+			where BSU.subscription = %(subscription)s and BSU.present = 1""",
 			{"subscription": subscription})[0][0] \
-		- frappe.db.sql("""select COUNT(*) from `tabBooking Class`
-			where subscription = %(subscription)s and present = 1""",
+		- frappe.db.sql("""select SUM(BTP.class_coefficient) 
+			from `tabBooking Class` BCL
+			inner join `tabBooking Slot` BSL ON BCL.parent = BSL.name
+			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
+			where BCL.subscription = %(subscription)s and BCL.present = 1""",
 			{"subscription": subscription})[0][0]
 
 	# classes = int(total_classes) - frappe.db.count("Booking Subscriber", {"subscriber": customer_id, "present": 1})
@@ -133,11 +139,13 @@ def get_classes(subscription_id):
 		BS.name AS slot,
 		BS.time_slot_display,
 		BS.type AS style,
+		BT.class_coefficient,
 		BS.time_slot,
 		TBS.present,
 		"" AS booking_no,
 		DATE_FORMAT(TBS.cancellation_date,%(str)s) AS cancellation_date
-	from `tabBooking Slot` BS   
+	from `tabBooking Slot` BS
+	inner join `tabBooking Type` BT ON BS.Type = BT.name   
 	inner join `tabBooking Subscriber` TBS on BS.name = TBS.parent
 	where TBS.subscription = %(subscription)s	
 	union ALL
@@ -145,11 +153,13 @@ def get_classes(subscription_id):
 		BS.name AS slot,
 		BS.time_slot_display,
 		BS.type AS style,
+		BT.class_coefficient,
 		BS.time_slot,
 		TBC.present,
 		TBC.booking AS booking_no,
 		DATE_FORMAT(TBC.cancellation_date,%(str)s) AS cancellation_date
-	from `tabBooking Slot` BS   
+	from `tabBooking Slot` BS
+	inner join `tabBooking Type` BT ON BS.Type = BT.name    
 	inner join `tabBooking Class` TBC on BS.name = TBC.parent
 	where TBC.subscription = %(subscription)s	
 	order by time_slot desc""",
