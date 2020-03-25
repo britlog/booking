@@ -63,7 +63,7 @@ class Booking(Document):
 			except Exception as e:
 				frappe.log_error(frappe.get_traceback(), 'SMS failed')  # Otherwise, booking is not registered in database if errors
 
-		# always send notification email to company master
+		# send notification email to company master
 		forward_to_email = frappe.db.get_value("Contact Us Settings", None, "forward_to_email")
 		comment_only_email_notify = frappe.db.get_single_value('Booking Settings', 'comment_only_email_notify')
 
