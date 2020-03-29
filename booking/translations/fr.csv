@@ -32,22 +32,22 @@ TODO,Booking SMS,SMS de Réservation
 TODO,Booking Subscription,Abonnement
 TODO,Reference,Référence
 TODO,Pick a subscription,Choisissez un abonnement
-TODO,Enable Catch Up,Activer Rattrapage
-TODO,A warning will be displayed to subscribers while booking if allowed catch up classes are over,Un avertissement sera affiché aux abonnés pendant la réservation si les cours de rattrapage autorisés sont épuisés
+TODO,Check Catch Up Quota,Contrôler le Quota de Rattrapage
+TODO,Warning displayed to subscribers if allowed catch up classes are over,Avertissement affiché aux abonnés si les cours de rattrapage autorisés sont épuisés
 TODO,Catch Up Class,Rattrapage
 TODO,Allowed Catch Up,Rattrapages Autorisés
 TODO,Remaining Catch Up,Rattrapages Restants
 TODO,Outside Subscription,Hors Abonnement
-TODO,A warning will be displayed to subscribers while booking,Un avertissement sera affiché aux abonnés pendant la réservation
+TODO,Warning displayed to subscribers while booking,Avertissement affiché aux abonnés pendant la réservation
 TODO,Ignore Subscription,Ignorer Abonnement
 TODO,Expiry Email Sent,E-mail d'Expiration Envoyé
 TODO,Balance Email Sent,E-mail de Solde Envoyé
-TODO,Notify by Email Only if Comment,Notifier par Email si Commentaire Seulement
+TODO,Notify by Email Only if Comment,Notifier par Email Seulement si Commentaire
 TODO,You will receive an email only if the customer added a comment,Vous allez recevoir un mail seulement si le client a ajouté un commentaire
 TODO,Booking Location,Lieu
 TODO,Booking Coach,Coach
 TODO,Disable Guest Booking,Désactiver Réservation Invité
-TODO,Only for trial classes and subscribers.,Seulement pour les cours d'essai et les abonnés.
+TODO,Bookings only for subscribers and trial classes if allowed,Réservations seulement pour les abonnés et les cours d'essai si autorisés
 TODO,Guest Booking Message,Message Réservation Invité
 TODO,Enable Auto Attendance,Activer Présence Auto
 TODO,Automatically validate subscriber's presence if class not cancelled,Valide automatiquement la présence de l'abonné si cours non annulé

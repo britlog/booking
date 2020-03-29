@@ -156,7 +156,7 @@ def get_classes(subscription_id):
 		BT.class_coefficient,
 		BS.time_slot,
 		TBC.present,
-		TBC.booking AS booking_no,
+		IFNULL(TBC.booking,'') AS booking_no,
 		DATE_FORMAT(TBC.cancellation_date,%(str)s) AS cancellation_date
 	from `tabBooking Slot` BS
 	inner join `tabBooking Type` BT ON BS.Type = BT.name    
