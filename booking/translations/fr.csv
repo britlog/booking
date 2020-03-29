@@ -33,7 +33,7 @@ TODO,Booking Subscription,Abonnement
 TODO,Reference,Référence
 TODO,Pick a subscription,Choisissez un abonnement
 TODO,Check Catch Up Quota,Contrôler le Quota de Rattrapage
-TODO,Warning displayed to subscribers if allowed catch up classes are over,Avertissement affiché aux abonnés si les cours de rattrapage autorisés sont épuisés
+TODO,Warning displayed to subscribers if allowed catch up classes are over,Avertissement affiché aux abonnés si les rattrapages autorisés sont épuisés
 TODO,Catch Up Class,Rattrapage
 TODO,Allowed Catch Up,Rattrapages Autorisés
 TODO,Remaining Catch Up,Rattrapages Restants
@@ -54,3 +54,5 @@ TODO,Automatically validate subscriber's presence if class not cancelled,Valide 
 TODO,Class Coefficient,Coefficient du Cours
 TODO,Subscription charge per class,Valeur décomptée de l'abonnement par cours
 TODO,Streaming Link,Lien du Streaming
+TODO,Billing Item,Article de Facturation
+TODO,Billing Customer,Client de Facturation
