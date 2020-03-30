@@ -168,6 +168,8 @@ def make_sales_invoice(item_code=None, customer=None):
 		frappe.throw(_("Invoice can't be made without customer"))
 
 	company = frappe.db.get_single_value('Global Defaults', 'default_company')
+	default_terms = frappe.get_value("Company", company, 'default_terms')
+
 	doc = frappe.get_doc({
 		"doctype": "Sales Invoice",
 		"customer": customer,
@@ -176,7 +178,9 @@ def make_sales_invoice(item_code=None, customer=None):
 			'doctype': 'Sales Invoice Item',
 			'item_code': item_code,
 			'qty': 1
-		}]
+		}],
+		"tc_name": default_terms,
+		"terms": frappe.db.get_value("Terms and Conditions", default_terms, "terms")
 	})
 
 	doc.insert(ignore_permissions=True)
