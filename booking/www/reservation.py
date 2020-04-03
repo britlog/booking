@@ -35,14 +35,14 @@ def get_slots(activity):
 
 	if activity:
 		slots = frappe.get_all("Booking Slot",
-			fields=["name","time_slot_display","type","available_places","total_places"],
+			fields=["name", "time_slot_display", "type", "available_places", "total_places", "practical_information"],
 			filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
 					 ["Booking Slot", "show_in_website", "=", 1],
 					 ["Booking Slot", "type", "=", activity]],
 			order_by="time_slot asc")
 	else:
 		slots = frappe.get_all("Booking Slot",
-		   fields=["name", "time_slot_display", "type", "available_places", "total_places"],
+		   fields=["name", "time_slot_display", "type", "available_places", "total_places", "practical_information"],
 		   filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
 					["Booking Slot", "show_in_website", "=", 1]],
 		   order_by="time_slot asc")

@@ -57,7 +57,8 @@ frappe.ready(function() {
 					}
 
 					$('[name="slot"]').append($('<option>').val(row.name).text((row.time_slot_display || row.name)+" | "+((activity) ? '' : row.type.toUpperCase()+" | ")+available_message)
-					.attr('available_places',row.available_places).attr('subscription_places',row.subscription_places));
+					.attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
+					.attr('practical_information',row.practical_information));
 
 	//                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
 				});
@@ -80,9 +81,19 @@ frappe.ready(function() {
 
     $('[name="slot"]').change(function () {
 
+		  // display practical information if specified
+		  if ($('[name="slot"] :selected').attr('practical_information')) {
+		  	$("#practical-information").html($('[name="slot"] :selected').attr('practical_information'));
+		  	$("#practical-information").toggle(true);
+          }
+          else {
+            $("#practical-information").html('');
+            $("#practical-information").toggle(false);
+          }
+
+		  // manage notification button display
           $("#notification-button").prop("disabled",false);
 
-//		  console.log($('[name="slot"] :selected').attr('available_places'));
           if ($('[name="slot"] :selected').attr('available_places') <= 0) {
             $("#notification-button").toggle(true);		//show button
           }
