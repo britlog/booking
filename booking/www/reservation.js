@@ -112,7 +112,12 @@ frappe.ready(function() {
 //		  frappe.msgprint($('[name="type"]').val());
 //		  $('[name="slot"]').val($('[name="slot"] option:first').val());
 		  $("#notification-button").toggle(false);	//hide button
+
+		  // reload slots
 		  get_slots($('[name="type"]').val());
+
+		  $("#practical-information").html('');
+          $("#practical-information").toggle(false);
 
      })
 
