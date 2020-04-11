@@ -9,27 +9,49 @@ from frappe import throw, _
 from frappe.core.doctype.sms_settings.sms_settings import send_sms
 from frappe.utils import now_datetime
 from erpnext.accounts.doctype.payment_request.payment_request import make_payment_request
+from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note, make_sales_invoice
 
 class Booking(Document):
 
 	def after_insert(self):
 		doc = frappe.get_doc("Booking Slot", self.slot)
 
-		# set property to the document
-		doc.available_places -= 1
-
 		# insert new booking class into child table
 		subscription = get_slot_subscription(self.email_id, self.slot)
 
-		doc.append("bookings", {
-			"full_name": self.full_name,
-			"booking": self.name,
-			"subscriber": subscription["customer"] if subscription else "",
-			"subscription": subscription["subscription"] if subscription and subscription["is_valid"] else ""
-		})
+		# payment
+		if doc.accept_payment and (not subscription or not subscription["is_valid"]):
 
-		# save document to the database
-		doc.save()
+			# create sales order if no valid subscription
+			so = make_sales_order(doc.billing_item, doc.billing_customer, doc.time_slot, doc.time_slot_display,
+								  self.name)
+
+			# create payment request
+			pr = make_payment_request(dt="Sales Order", dn=so.name, recipient_id=self.email_id, submit_doc=True,
+									  mute_email=True, return_doc=True)
+			pr.set_payment_request_url()
+
+			self.payment_request = pr.name
+			self.status = "Payment Ordered"
+			self.save(ignore_permissions=True)
+
+		# in case of payment, it will be done after successful payment
+		else:
+			doc.append("bookings", {
+				"full_name": self.full_name,
+				"booking": self.name,
+				"subscriber": subscription["customer"] if subscription else "",
+				"subscription": subscription["subscription"] if subscription and subscription["is_valid"] else ""
+			})
+
+			# decrease available places
+			doc.available_places -= 1
+
+			# save document to the database
+			doc.save()
+
+			# send SMS and email confirmation
+			self.send_confirmation()
 
 		# add email to the main newsletter
 		if self.email_id:
@@ -48,53 +70,6 @@ class Booking(Document):
 
 				frappe.get_doc("Email Group", email_group).update_total_subscribers()
 				frappe.db.commit()
-
-		# send SMS notification
-		if self.phone and self.confirm_sms:
-			receiver_list = [self.phone]
-
-			sms_template = frappe.db.get_single_value('Booking Settings', 'booking_sms')
-			args = frappe.get_doc('Booking Slot', self.slot).as_dict()
-			message = frappe.render_template(sms_template, args)
-
-			try:
-				send_sms(receiver_list,message,'',False)
-			except Exception as e:
-				frappe.log_error(frappe.get_traceback(), 'SMS failed')  # Otherwise, booking is not registered in database if errors
-
-		# send notification email to company master
-		forward_to_email = frappe.db.get_value("Contact Us Settings", None, "forward_to_email")
-		comment_only_email_notify = frappe.db.get_single_value('Booking Settings', 'comment_only_email_notify')
-
-		if forward_to_email and (self.comment or not comment_only_email_notify):
-			messages = (
-				_("Nouvelle réservation n°"),
-				self.name,
-				_("pour le"),
-				frappe.db.get_value("Booking Slot", self.slot, "time_slot_display"),
-				_("Nom"),
-				self.full_name,
-				_("Commentaire"),
-				self.comment
-			)
-
-			content = """
-				<div style="font-family: verdana; font-size: 16px;">
-				<p>{0} {1} {2} <strong>{3}</strong>.</p>
-				<p>{4} : {5}</p>
-				<p>{6} : {7}</p>
-				</div>
-				"""
-
-			subject =  "Réservation de " + self.full_name
-			if self.comment and not comment_only_email_notify:
-				subject += "*"
-
-			try:
-				frappe.sendmail(recipients=forward_to_email, sender=self.email_id, content=content.format(*messages), subject=subject)
-			except Exception as e:
-				frappe.log_error(frappe.get_traceback(),'email to company failed')  # Otherwise, booking is not registered in database if errors
-
 
 	def before_insert(self):
 
@@ -136,15 +111,57 @@ class Booking(Document):
 			if not subscription or not subscription["is_valid"]:
 				frappe.throw(frappe.db.get_single_value('Booking Settings', 'guest_booking_message'))
 
-		# payment
-		if doc.accept_payment and (not subscription or not subscription["is_valid"]):
-			# create invoice if no valid subscription
-			si = make_sales_invoice(doc.billing_item, doc.billing_customer)
 
-			# create payment request
-			# email is automatically sent to customer
-			pr = make_payment_request(dt="Sales Invoice", dn=si.name, recipient_id=self.email_id, submit_doc=True)
-			self.payment_request = pr.name
+	def send_confirmation(self):
+		# send SMS notification
+		if self.phone and self.confirm_sms:
+			receiver_list = [self.phone]
+
+			sms_template = frappe.db.get_single_value('Booking Settings', 'booking_sms')
+			args = frappe.get_doc('Booking Slot', self.slot).as_dict()
+			message = frappe.render_template(sms_template, args)
+
+			try:
+				send_sms(receiver_list, message, '', False)
+			except Exception as e:
+				frappe.log_error(frappe.get_traceback(),
+								 'SMS failed')  # Otherwise, booking is not registered in database if errors
+
+		# send notification email to company master
+		forward_to_email = frappe.db.get_value("Contact Us Settings", None, "forward_to_email")
+		comment_only_email_notify = frappe.db.get_single_value('Booking Settings', 'comment_only_email_notify')
+
+		if forward_to_email and (self.comment or not comment_only_email_notify):
+			messages = (
+				_("Nouvelle réservation n°"),
+				self.name,
+				_("pour le"),
+				frappe.db.get_value("Booking Slot", self.slot, "time_slot_display"),
+				_("Nom"),
+				self.full_name,
+				_("Commentaire"),
+				self.comment
+			)
+
+			content = """
+				<div style="font-family: verdana; font-size: 16px;">
+				<p>{0} {1} {2} <strong>{3}</strong>.</p>
+				<p>{4} : {5}</p>
+				<p>{6} : {7}</p>
+				</div>
+				"""
+
+			subject = "Réservation de " + self.full_name
+			if self.comment and not comment_only_email_notify:
+				subject += "*"
+
+			try:
+				frappe.sendmail(recipients=forward_to_email, sender=self.email_id, content=content.format(*messages),
+								subject=subject)
+			except Exception as e:
+				frappe.log_error(frappe.get_traceback(),
+								 'email to company failed')  # Otherwise, booking is not registered in database if errors
+
 
 def is_trial_class(email, activity):
 
@@ -159,34 +176,84 @@ def is_trial_class(email, activity):
 
 		return True if booking_nb <= 0 else False
 
-def make_sales_invoice(item_code=None, customer=None):
+def make_sales_order(item_code, customer, delivery_date, time_slot, booking_name):
 
 	if not item_code:
-		frappe.throw(_("Invoice can't be made without items"))
+		frappe.throw(_("Order can't be made without items"))
 
 	if not customer:
-		frappe.throw(_("Invoice can't be made without customer"))
+		frappe.throw(_("Order can't be made without customer"))
 
 	company = frappe.db.get_single_value('Global Defaults', 'default_company')
 	default_terms = frappe.get_value("Company", company, 'default_terms')
 
 	doc = frappe.get_doc({
-		"doctype": "Sales Invoice",
+		"doctype": "Sales Order",
 		"customer": customer,
 		"company": company,
+		"delivery_date": delivery_date,
 		"items": [{
-			'doctype': 'Sales Invoice Item',
+			'doctype': 'Sales Order Item',
 			'item_code': item_code,
+			'description': "Cours du "+time_slot,
 			'qty': 1
 		}],
 		"tc_name": default_terms,
-		"terms": frappe.db.get_value("Terms and Conditions", default_terms, "terms")
+		"terms": frappe.db.get_value("Terms and Conditions", default_terms, "terms"),
+		"booking": booking_name
 	})
 
 	doc.insert(ignore_permissions=True)
 	doc.submit()
 
 	return doc
+
+def update_status(pr_doc, method):
+
+	# confirm booking when payment request is paid
+	if pr_doc.reference_doctype == "Sales Order" and pr_doc.status == "Paid":
+
+		# get the booking
+		booking_name = frappe.db.get_value("Sales Order", pr_doc.reference_name, "booking")
+
+		if booking_name:
+			booking_doc = frappe.get_doc("Booking", booking_name)
+			booking_doc.status = "Confirmed"
+			booking_doc.save()
+
+			slot_doc = frappe.get_doc("Booking Slot", booking_doc.slot)
+			slot_doc.append("bookings", {
+				"full_name": booking_doc.full_name,
+				"booking": booking_doc.name
+			})
+
+			# decrease available places
+			slot_doc.available_places -= 1
+			slot_doc.save()
+
+			# send SMS and email confirmation
+			booking_doc.send_confirmation()
+
+def convert_sales_order():
+
+	# make sales invoice from sales order
+	# get all sales orders linked to a booking
+	orders = frappe.get_all("Sales Order",
+				filters=[["ifnull(booking, '')", "!=", ""], ["delivery_date", "<", now_datetime()],
+						 ["status", "=", "To Deliver and Bill"]],
+				fields=['name'])
+
+	for order in orders:
+		# without delivery not, sales order status will stay in "Overdue"
+		dn = make_delivery_note(order.name)
+		dn = dn.insert()
+		dn.submit()
+
+		# finally make the invoice and get the advance payment
+		si = make_sales_invoice(order.name)
+		si.allocate_advances_automatically = True
+		si = si.insert()
+		si.submit()
 
 @frappe.whitelist(allow_guest=True)
 def get_slot_subscription(email_id, slot_id):

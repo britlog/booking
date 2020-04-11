@@ -238,13 +238,20 @@ frappe.ready(function() {
 							'comment': comment
 						},
 						callback: function(r) {
-							if (r.message){
-								frappe.msgprint(r.message);
+							if (!jQuery.isEmptyObject(r.message)){
 
-								//Init form
-								$('[name="type"]').val('');
-								get_slots("");
-								$('[name="comment"]').val('');
+								if (r.message.payment_url) {
+									// redirect to payment
+									window.location.href = r.message.payment_url;
+								}
+								else {
+									frappe.msgprint(r.message.success_message);
+
+									//Init form
+									$('[name="type"]').val('');
+									get_slots("");
+									$('[name="comment"]').val('');
+								}
 							};
 						}
     				});

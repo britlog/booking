@@ -83,6 +83,12 @@ app_license = "GNU General Public License"
 #      }
 # }
 
+doc_events = {
+     "Payment Request": {
+         "on_change": "booking.booking.doctype.booking.booking.update_status"
+     }
+}
+
 # doctype_js = {
 #     "Customer": ["booking/custom_scripts/customer.js"]
 # }
@@ -95,7 +101,8 @@ scheduler_events = {
 		"booking.booking.doctype.booking_notification.booking_notification.send_notification_email"
 	],
 	"daily": [
-		"booking.booking.doctype.booking_subscription.booking_subscription.update_subscriptions"
+		"booking.booking.doctype.booking_subscription.booking_subscription.update_subscriptions",
+		"booking.booking.doctype.booking.booking.convert_sales_order"
 	]
 }
 # scheduler_events = {

@@ -95,6 +95,7 @@ def set_notification(slot, email, name):
 
 @frappe.whitelist(allow_guest=True)
 def add_booking(slot, email, name, city, phone, sms, comment):
+	validation = {}
 
 	doc = frappe.get_doc({
 		"doctype": "Booking",
@@ -108,4 +109,8 @@ def add_booking(slot, email, name, city, phone, sms, comment):
 	})
 	doc.insert()
 
-	return "Réservation confirmée"
+	# payment URL
+	validation["payment_url"] = frappe.get_value("Payment Request", doc.payment_request, 'payment_url')
+	validation["success_message"] = "Réservation confirmée"
+
+	return validation
