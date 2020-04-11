@@ -19,11 +19,12 @@ class Booking(Document):
 		# insert new booking class into child table
 		subscription = get_slot_subscription(self.email_id, self.slot)
 
+		type_doc = frappe.get_doc("Booking Type", doc.type)
 		# payment
-		if doc.accept_payment and (not subscription or not subscription["is_valid"]):
+		if type_doc.accept_payment and (not subscription or not subscription["is_valid"]) and not self.trial_class:
 
 			# create sales order if no valid subscription
-			so = make_sales_order(doc.billing_item, doc.billing_customer, doc.time_slot, doc.time_slot_display,
+			so = make_sales_order(type_doc.billing_customer, type_doc.billing_item, doc.time_slot, doc.time_slot_display,
 								  self.name)
 
 			# create payment request
@@ -176,13 +177,7 @@ def is_trial_class(email, activity):
 
 		return True if booking_nb <= 0 else False
 
-def make_sales_order(item_code, customer, delivery_date, time_slot, booking_name):
-
-	if not item_code:
-		frappe.throw(_("Order can't be made without items"))
-
-	if not customer:
-		frappe.throw(_("Order can't be made without customer"))
+def make_sales_order(customer, item_code, delivery_date, time_slot, booking_name):
 
 	company = frappe.db.get_single_value('Global Defaults', 'default_company')
 	default_terms = frappe.get_value("Company", company, 'default_terms')
