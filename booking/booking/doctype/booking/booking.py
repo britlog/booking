@@ -250,6 +250,25 @@ def convert_sales_order():
 		si = si.insert()
 		si.submit()
 
+def update_booking_status(slot=None):
+
+	# get all bookings of this slot
+	bookings = frappe.get_all("Booking Class",
+		filters=[ ["parent", "=", slot] ],
+		fields=['booking', 'cancellation_date'])
+
+	for booking in bookings:
+		doc = frappe.get_doc('Booking', booking.booking)
+
+		if booking.cancellation_date:
+			status = "Cancelled"
+		else:
+			status = "Confirmed"
+
+		if doc.status != status:
+			doc.status = status
+			doc.save()
+
 @frappe.whitelist(allow_guest=True)
 def get_slot_subscription(email_id, slot_id):
 

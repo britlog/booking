@@ -1,10 +1,6 @@
 // Copyright (c) 2016, Britlog and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Booking Slot', "type", function(frm) {
-    frm.add_fetch('type','default_places','total_places');
-});
-
 frappe.ui.form.on('Booking Slot', "total_places", function(frm) {
     var nb_subscribers = 0;
     var nb_bookings = 0;

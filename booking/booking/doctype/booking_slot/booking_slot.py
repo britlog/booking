@@ -8,6 +8,7 @@ import frappe
 from frappe.model.document import Document
 from booking.booking.doctype.booking_notification.booking_notification import trigger_notification
 from booking.booking.doctype.booking_subscription.booking_subscription import update_subscriptions
+from booking.booking.doctype.booking.booking import update_booking_status
 
 class BookingSlot(Document):
 
@@ -23,3 +24,4 @@ class BookingSlot(Document):
 
     def on_update(self):
         update_subscriptions(self.name)
+        update_booking_status(self.name)
