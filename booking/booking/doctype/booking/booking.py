@@ -38,6 +38,11 @@ class Booking(Document):
 
 		# in case of payment, it will be done after successful payment
 		else:
+			# confirm booking
+			self.status = "Confirmed"
+			self.save(ignore_permissions=True)
+
+			# add booking to slot
 			doc.append("bookings", {
 				"full_name": self.full_name,
 				"booking": self.name,
