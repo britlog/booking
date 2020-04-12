@@ -241,19 +241,39 @@ def convert_sales_order():
 	orders = frappe.get_all("Sales Order",
 				filters=[["ifnull(booking, '')", "!=", ""], ["delivery_date", "<", now_datetime()],
 						 ["status", "=", "To Deliver and Bill"]],
-				fields=['name'])
+				fields=['name','booking'])
 
 	for order in orders:
-		# without delivery not, sales order status will stay in "Overdue"
-		dn = make_delivery_note(order.name)
-		dn = dn.insert()
-		dn.submit()
 
-		# finally make the invoice and get the advance payment
-		si = make_sales_invoice(order.name)
-		si.allocate_advances_automatically = True
-		si = si.insert()
-		si.submit()
+		# first cancel orders without payment entry (= booking not confirmed)
+		bk = frappe.get_doc("Booking", order.booking)
+
+		if bk.status != "Confirmed":
+			# cancel the payment request
+			pr = frappe.get_doc("Payment Request", bk.payment_request)
+			if pr:
+				pr.cancel()
+
+			# cancel the order
+			so = frappe.get_doc("Sales Order", order.name)
+			if so:
+				so.cancel()
+
+			# cancel the booking
+			bk.status = "Cancelled"
+			bk.save()
+
+		else:
+			# without delivery note, sales order status will stay in "Overdue"
+			dn = make_delivery_note(order.name)
+			dn = dn.insert()
+			dn.submit()
+
+			# finally make the invoice and get the advance payment
+			si = make_sales_invoice(order.name)
+			si.allocate_advances_automatically = True
+			si = si.insert()
+			si.submit()
 
 def update_booking_status(slot=None):
 
