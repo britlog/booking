@@ -245,10 +245,10 @@ def convert_sales_order():
 
 	for order in orders:
 
-		# first cancel orders without payment entry (= booking not confirmed)
+		# first cancel orders without payment entry
 		bk = frappe.get_doc("Booking", order.booking)
 
-		if bk.status != "Confirmed":
+		if bk.status == "Payment Ordered":
 			# cancel the payment request
 			pr = frappe.get_doc("Payment Request", bk.payment_request)
 			if pr:
@@ -258,10 +258,6 @@ def convert_sales_order():
 			so = frappe.get_doc("Sales Order", order.name)
 			if so:
 				so.cancel()
-
-			# cancel the booking
-			bk.status = "Cancelled"
-			bk.save()
 
 		else:
 			# without delivery note, sales order status will stay in "Overdue"
