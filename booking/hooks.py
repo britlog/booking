@@ -85,7 +85,7 @@ app_license = "GNU General Public License"
 
 doc_events = {
      "Payment Request": {
-         "on_change": "booking.booking.doctype.booking.booking.update_status"
+         "on_change": "booking.booking.doctype.booking.booking.update_payment_status"
      }
 }
 

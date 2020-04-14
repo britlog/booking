@@ -19,10 +19,9 @@ class Booking(Document):
 		# insert new booking class into child table
 		subscription = get_slot_subscription(self.email_id, self.slot)
 
-		type_doc = frappe.get_doc("Booking Type", doc.type)
 		# payment
+		type_doc = frappe.get_doc("Booking Type", doc.type)
 		if type_doc.accept_payment and (not subscription or not subscription["is_valid"]) and not self.trial_class:
-
 			# create sales order if no valid subscription
 			so = make_sales_order(type_doc.billing_customer, type_doc.billing_item, doc.time_slot, doc.time_slot_display,
 								  self.name)
@@ -36,9 +35,9 @@ class Booking(Document):
 			self.status = "Payment Ordered"
 			self.save(ignore_permissions=True)
 
-		# in case of payment, it will be done after successful payment
 		else:
 			# confirm booking
+			# in case of payment, it will be done after successful payment
 			self.status = "Confirmed"
 			self.save(ignore_permissions=True)
 
@@ -208,7 +207,7 @@ def make_sales_order(customer, item_code, delivery_date, time_slot, booking_name
 
 	return doc
 
-def update_status(pr_doc, method):
+def update_payment_status(pr_doc, method):
 
 	# confirm booking when payment request is paid
 	if pr_doc.reference_doctype == "Sales Order" and pr_doc.status == "Paid":
@@ -279,16 +278,17 @@ def update_booking_status(slot=None):
 		fields=['booking', 'cancellation_date'])
 
 	for booking in bookings:
-		doc = frappe.get_doc('Booking', booking.booking)
+		if booking.booking:
+			doc = frappe.get_doc('Booking', booking.booking)
 
-		if booking.cancellation_date:
-			status = "Cancelled"
-		else:
-			status = "Confirmed"
+			if booking.cancellation_date:
+				status = "Cancelled"
+			else:
+				status = "Confirmed"
 
-		if doc.status != status:
-			doc.status = status
-			doc.save()
+			if doc.status != status:
+				doc.status = status
+				doc.save()
 
 @frappe.whitelist(allow_guest=True)
 def get_slot_subscription(email_id, slot_id):
