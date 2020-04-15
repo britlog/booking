@@ -57,9 +57,11 @@ def update_subscriptions(slot=None):
 	for subscription in subscriptions:
 		doc = frappe.get_doc('Booking Subscription', subscription.name)
 		remaining_classes = get_remaining_classes(doc.subscribed_classes, doc.name)
+		remaining_catch_up = get_remaining_catch_up(doc.allowed_catch_up, doc.name)
 
-		if doc.remaining_classes != remaining_classes:
+		if doc.remaining_classes != remaining_classes or doc.remaining_catch_up != remaining_catch_up :
 			doc.remaining_classes = remaining_classes
+			doc.remaining_catch_up = remaining_catch_up
 
 			# save the Subscription Doctype to the database
 			doc.save()
@@ -69,8 +71,9 @@ def update_subscriptions(slot=None):
 def get_remaining_classes(subscribed_classes, subscription):
 
 	if not subscribed_classes:
-		subscribed_classes=0
+		subscribed_classes = 0
 
+	# remaining classes
 	classes = int(subscribed_classes) \
 		- frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
 			from `tabBooking Subscriber` BSU
@@ -85,32 +88,24 @@ def get_remaining_classes(subscribed_classes, subscription):
 			where BCL.subscription = %(subscription)s and BCL.present = 1""",
 			{"subscription": subscription})[0][0]
 
-	# classes = int(total_classes) - frappe.db.count("Booking Subscriber", {"subscriber": customer_id, "present": 1})
-
-	# missed = frappe.db.sql("""select COUNT(*)
-	#     from `tabBooking Subscriber`
-	#     inner join `tabBooking Slot` on `tabBooking Subscriber`.parent=`tabBooking Slot`.name
-	#     where `tabBooking Subscriber`.subscriber = %(customer)s and present = 0
-	#     and CAST(`tabBooking Slot`.time_slot AS DATE)>=%(subscription_date)s""",
-	#     {"customer": customer_id , "subscription_date": start_date})[0][0]
-	#
-	# # missed = frappe.db.count("Booking Subscriber",{"subscriber": customer_id, "present": 0})
-	#
-	# if total_classes == 10:
-	#     max_missed = 2
-	# elif total_classes == 20:
-	#     max_missed = 4
-	# elif total_classes == 40:
-	#     max_missed = 8
-	# else:
-	#     max_missed = 99  # unlimited
-	#
-	# lost = missed - max_missed
-	#
-	# if lost>0:
-	#     classes -= lost  # lost classes
-
 	return classes #max(0,classes)
+
+@frappe.whitelist()
+def get_remaining_catch_up(allowed_catch_up, subscription):
+
+	if not allowed_catch_up:
+		allowed_catch_up = 0
+
+	# remaining catch up
+	catch_up = int(allowed_catch_up) \
+		- frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
+			from `tabBooking Class` BCL
+			inner join `tabBooking Slot` BSL ON BCL.parent = BSL.name
+			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
+			where BCL.subscription = %(subscription)s and BCL.present = 1 and BTP.check_catch_up = 1""",
+			{"subscription": subscription})[0][0]
+
+	return catch_up
 
 @frappe.whitelist(allow_guest=True)
 def get_subscriptions(email_id):

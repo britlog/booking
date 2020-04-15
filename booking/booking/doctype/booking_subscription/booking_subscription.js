@@ -27,6 +27,21 @@ frappe.ui.form.on('Booking Subscription', "subscribed_classes", function(frm) {
     });
 });
 
+frappe.ui.form.on('Booking Subscription', "allowed_catch_up", function(frm) {
+
+    frappe.call({
+        method: "booking.booking.doctype.booking_subscription.booking_subscription.get_remaining_catch_up",
+        args: {
+            "allowed_catch_up": frm.doc.allowed_catch_up,
+            "subscription": frm.doc.name
+        },
+        callback: function(r) {
+            //console.log(r.message);
+            frm.set_value("remaining_catch_up", r.message);
+        }
+    });
+});
+
 //frappe.ui.form.on('Booking Subscription', "customer", function(frm) {
 //    frm.add_fetch('customer','email_id','email_id');
 //});
