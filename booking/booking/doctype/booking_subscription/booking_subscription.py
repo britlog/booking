@@ -116,6 +116,7 @@ def get_subscriptions(email_id):
 		IFNULL(BSU.reference,'') AS reference,
 		BSU.subscribed_classes AS subscribed_classes,
 		BSU.remaining_classes AS remaining_classes,
+		BSU.remaining_catch_up AS remaining_catch_up,
 		DATE_FORMAT(BSU.start_date,%(str)s) AS start_date,
 		DATE_FORMAT(BSU.end_date,%(str)s) AS end_date
 	from `tabBooking Subscription` BSU

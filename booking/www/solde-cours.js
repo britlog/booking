@@ -32,9 +32,11 @@ frappe.ready(function() {
 					$('[id="subscriptions"]').empty();
 					$('[id="subscriptions"]').append($('<option>').val('').text("{{ _("Pick a subscription") }}"));
 					(r.message || []).forEach(function(row){
-						$('[id="subscriptions"]').append($('<option>').val(row.name).text(row.name+" : "+row.start_date+" "+(row.reference || ''))
+						$('[id="subscriptions"]').append($('<option>').val(row.name).text(row.name+" du "+row.start_date
+							+" | "+row.subscribed_classes+" cours | "+(row.reference || ''))
 						.attr('subscribed_classes',row.subscribed_classes)
 						.attr('remaining_classes',row.remaining_classes)
+						.attr('remaining_catch_up',row.remaining_catch_up)
 						.attr('end_date',row.end_date));
 					});
 				}
@@ -57,6 +59,7 @@ frappe.ready(function() {
 		if ( $("select option:selected").val() ) {
 			var subscribed_classes = $("select option:selected").attr('subscribed_classes');
 			var remaining_classes = $("select option:selected").attr('remaining_classes');
+			var remaining_catch_up = $("select option:selected").attr('remaining_catch_up');
 			var validity_date = $("select option:selected").attr('end_date');
 
 			if(!validity_date)
@@ -64,7 +67,11 @@ frappe.ready(function() {
 			else validity_date = " jusqu'au "+validity_date;
 
 			//frappe.msgprint("Il vous reste "+num.toString()+" cours");
-			msgprint_alert("Il vous reste "+remaining_classes.toString()+" cours (sur "+subscribed_classes+")"+validity_date);
+			var subscription_status = "Il vous reste "+remaining_classes.toString()+" cours "+validity_date;
+			if (remaining_catch_up != 0) {
+				subscription_status += ", dont "+remaining_catch_up.toString()+" en rattrapage";
+			}
+			msgprint_alert(subscription_status);
 
 			//print detail classes table
 			frappe.call({
