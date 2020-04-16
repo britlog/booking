@@ -139,7 +139,9 @@ def get_classes(subscription_id):
 		BS.time_slot,
 		TBS.present,
 		"" AS booking_no,
-		DATE_FORMAT(TBS.cancellation_date,%(str)s) AS cancellation_date
+		DATE_FORMAT(TBS.cancellation_date,%(str)s) AS cancellation_date,
+		BT.is_cancelable,
+		BT.cancellation_period
 	from `tabBooking Slot` BS
 	inner join `tabBooking Type` BT ON BS.Type = BT.name   
 	inner join `tabBooking Subscriber` TBS on BS.name = TBS.parent
@@ -153,7 +155,9 @@ def get_classes(subscription_id):
 		BS.time_slot,
 		TBC.present,
 		IFNULL(TBC.booking,'') AS booking_no,
-		DATE_FORMAT(TBC.cancellation_date,%(str)s) AS cancellation_date
+		DATE_FORMAT(TBC.cancellation_date,%(str)s) AS cancellation_date,
+		BT.is_cancelable,
+		BT.cancellation_period
 	from `tabBooking Slot` BS
 	inner join `tabBooking Type` BT ON BS.Type = BT.name    
 	inner join `tabBooking Class` TBC on BS.name = TBC.parent

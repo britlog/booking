@@ -34,7 +34,6 @@ frappe.ready(function() {
 					(r.message || []).forEach(function(row){
 						$('[id="subscriptions"]').append($('<option>').val(row.name).text(row.name+" du "+row.start_date
 							+" | "+row.subscribed_classes+" cours | "+(row.reference || ''))
-						.attr('subscribed_classes',row.subscribed_classes)
 						.attr('remaining_classes',row.remaining_classes)
 						.attr('remaining_catch_up',row.remaining_catch_up)
 						.attr('end_date',row.end_date));
@@ -57,7 +56,6 @@ frappe.ready(function() {
 
 		//console.log(r.message);
 		if ( $("select option:selected").val() ) {
-			var subscribed_classes = $("select option:selected").attr('subscribed_classes');
 			var remaining_classes = $("select option:selected").attr('remaining_classes');
 			var remaining_catch_up = $("select option:selected").attr('remaining_catch_up');
 			var validity_date = $("select option:selected").attr('end_date');
@@ -106,9 +104,13 @@ frappe.ready(function() {
 
 								if (row.cancellation_date)
 									tableData += '<td style="text-align: center;">' + row.cancellation_date + '</td>';
-								else {
+								else if (row.is_cancelable) {
 									var CurrentDate = new Date();
 									var TimeSlotDate = new Date(row.time_slot.replace(/\s/, 'T'));
+
+									// add class cancellation period
+									if (row.cancellation_period > 0)
+										CurrentDate.setHours( CurrentDate.getHours() + row.cancellation_period );
 
 									if (TimeSlotDate > CurrentDate)
 										tableData += '<td style="text-align: center;padding: 5px;"><input class="btn btn-primary" type="button" id="'+ row.slot +'" \
