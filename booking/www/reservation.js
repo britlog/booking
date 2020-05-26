@@ -206,7 +206,7 @@ frappe.ready(function() {
             }
 		}
 
-		// Check if catch up class is allowed or display a warning message
+		// Check subscription validity if any
 		frappe.call({
             method: 'booking.booking.doctype.booking.booking.get_slot_subscription',
             args: {

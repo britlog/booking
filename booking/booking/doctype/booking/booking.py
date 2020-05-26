@@ -24,7 +24,7 @@ class Booking(Document):
 		if type_doc.accept_payment and (not subscription or not subscription["is_valid"]) and not self.trial_class:
 			# create sales order if no valid subscription
 			so = make_sales_order(type_doc.billing_customer, type_doc.billing_item, doc.time_slot, doc.time_slot_display,
-								  self.name)
+								  self.name, self.full_name)
 
 			# create payment request
 			pr = make_payment_request(dt="Sales Order", dn=so.name, recipient_id=self.email_id, submit_doc=True,
@@ -181,7 +181,7 @@ def is_trial_class(email, activity):
 
 		return True if booking_nb <= 0 else False
 
-def make_sales_order(customer, item_code, delivery_date, time_slot, booking_name):
+def make_sales_order(customer, item_code, delivery_date, time_slot, booking_name, full_name):
 
 	company = frappe.db.get_single_value('Global Defaults', 'default_company')
 	default_terms = frappe.get_value("Company", company, 'default_terms')
@@ -199,7 +199,8 @@ def make_sales_order(customer, item_code, delivery_date, time_slot, booking_name
 		}],
 		"tc_name": default_terms,
 		"terms": frappe.db.get_value("Terms and Conditions", default_terms, "terms"),
-		"booking": booking_name
+		"booking": booking_name,
+		"title": full_name
 	})
 
 	doc.insert(ignore_permissions=True)
@@ -298,6 +299,7 @@ def get_slot_subscription(email_id, slot_id):
 	subscriptions = frappe.db.sql("""
 		select	C.name as customer, 
 				BSU.name as subscription,
+				BSU.remaining_classes,
 				BSU.remaining_catch_up
 		from `tabBooking Subscription` BSU
 		inner join `tabCustomer` C on BSU.customer = C.name
@@ -312,7 +314,27 @@ def get_slot_subscription(email_id, slot_id):
 		subscription["is_valid"] = True
 		subscription["warning_msg"] = ""
 
+		# available classes = subscription remaining classes - pending bookings
+		available_classes = float(subscription["remaining_classes"]) \
+		  - frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
+			from `tabBooking Subscriber` BSU
+			inner join `tabBooking Slot` BSL ON BSU.parent = BSL.name
+			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
+			where BSU.subscription = %(subscription)s and BSU.present = 0 and BSU.cancellation_date is null""",
+						  {"subscription": subscription["subscription"]})[0][0] \
+		  - frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
+			from `tabBooking Class` BCL
+			inner join `tabBooking Slot` BSL ON BCL.parent = BSL.name
+			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
+			where BCL.subscription = %(subscription)s and BCL.present = 0 and BCL.cancellation_date is null""",
+						  {"subscription": subscription["subscription"]})[0][0]
+
 		activity = frappe.get_value("Booking Slot", slot_id, 'type')
+		coefficient = frappe.get_value("Booking Type", activity, 'class_coefficient')
+
+		if available_classes < coefficient:
+			# not enough remaining classes for this slot
+			return False
 
 		if frappe.get_value("Booking Type", activity, 'outside_subscription'):
 			subscription["is_valid"] = False

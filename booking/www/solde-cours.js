@@ -25,7 +25,7 @@ frappe.ready(function() {
 			method: 'booking.booking.doctype.booking_subscription.booking_subscription.get_subscriptions',
 			args: args,
 			callback: function(r) {
-				console.log(r.message);
+//				console.log(r.message);
 				if (!jQuery.isEmptyObject(r.message)) {
 					$("#contact-alert").toggle(false);
 					$('[id="subscriptions"]').toggle(true);
