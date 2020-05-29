@@ -56,9 +56,12 @@ frappe.ready(function() {
 						available_message = row.available_places+" places disponibles";
 					}
 
-					$('[name="slot"]').append($('<option>').val(row.name).text((row.time_slot_display || row.name)+" | "+((activity) ? '' : row.type.toUpperCase()+" | ")+available_message)
-					.attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
-					.attr('practical_information',row.practical_information));
+					$('[name="slot"]').append($('<option>').val(row.name).text((row.time_slot_display || row.name)
+						+((!row.location) ? '' : ' '+row.location)
+						+((activity) ? '' : " | "+row.type.toUpperCase())
+						+" | "+available_message)
+						.attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
+						.attr('practical_information',row.practical_information));
 
 	//                if (row.available_places == 0) { $('select option:contains("'+row.name+'")').attr("disabled", "disabled"); }
 				});
