@@ -55,26 +55,15 @@ class Booking(Document):
 			# save document to the database
 			doc.save()
 
-			# send SMS and email confirmation
-			self.send_confirmation()
+			# send SMS confirmation
+			self.send_sms_confirmation()
+
+		# send email to company master, even if payment not done yet
+		# otherwise, customer comment may never be read
+		self.send_email_to_company()
 
 		# add email to the main newsletter
-		if self.email_id:
-
-			parsed_email = frappe.utils.validate_email_add(self.email_id, False)
-			email_group = _("Website", lang='fr')
-
-			if parsed_email:
-				if not frappe.db.get_value("Email Group Member",
-										   {"email_group": email_group, "email": parsed_email}):
-					frappe.get_doc({
-						"doctype": "Email Group Member",
-						"email_group": email_group,
-						"email": parsed_email
-					}).insert(ignore_permissions=True)
-
-				frappe.get_doc("Email Group", email_group).update_total_subscribers()
-				frappe.db.commit()
+		self.add_email_to_newsletter()
 
 	def before_insert(self):
 
@@ -117,7 +106,7 @@ class Booking(Document):
 				frappe.throw(frappe.db.get_single_value('Booking Settings', 'guest_booking_message'))
 
 
-	def send_confirmation(self):
+	def send_sms_confirmation(self):
 		# send SMS notification
 		if self.phone and self.confirm_sms:
 			receiver_list = [self.phone]
@@ -132,6 +121,7 @@ class Booking(Document):
 				frappe.log_error(frappe.get_traceback(),
 								 'SMS failed')  # Otherwise, booking is not registered in database if errors
 
+	def send_email_to_company(self):
 		# send notification email to company master
 		forward_to_email = frappe.db.get_value("Contact Us Settings", None, "forward_to_email")
 		comment_only_email_notify = frappe.db.get_single_value('Booking Settings', 'comment_only_email_notify')
@@ -167,6 +157,22 @@ class Booking(Document):
 				frappe.log_error(frappe.get_traceback(),
 								 'email to company failed')  # Otherwise, booking is not registered in database if errors
 
+	def add_email_to_newsletter(self):
+		if self.email_id:
+			parsed_email = frappe.utils.validate_email_add(self.email_id, False)
+			email_group = _("Website", lang='fr')
+
+			if parsed_email:
+				if not frappe.db.get_value("Email Group Member",
+										   {"email_group": email_group, "email": parsed_email}):
+					frappe.get_doc({
+						"doctype": "Email Group Member",
+						"email_group": email_group,
+						"email": parsed_email
+					}).insert(ignore_permissions=True)
+
+				frappe.get_doc("Email Group", email_group).update_total_subscribers()
+				frappe.db.commit()
 
 def is_trial_class(email, activity):
 
@@ -231,8 +237,8 @@ def update_payment_status(pr_doc, method):
 			slot_doc.available_places -= 1
 			slot_doc.save()
 
-			# send SMS and email confirmation
-			booking_doc.send_confirmation()
+			# send SMS confirmation
+			booking_doc.send_sms_confirmation()
 
 def convert_sales_order():
 
