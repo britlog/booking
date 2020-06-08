@@ -64,7 +64,7 @@ def update_subscriptions(slot=None):
 			doc.remaining_catch_up = remaining_catch_up
 
 			# save the Subscription Doctype to the database
-			doc.save()
+			doc.save(ignore_permissions=True)
 
 
 @frappe.whitelist()
@@ -188,6 +188,6 @@ def report_absence(slot, subscription_id, booking_no):
 	doc.available_places += 1
 
 	# save document to the database
-	doc.save()
+	doc.save(ignore_permissions=True)
 
 	return True

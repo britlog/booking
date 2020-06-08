@@ -53,7 +53,7 @@ class Booking(Document):
 			doc.available_places -= 1
 
 			# save document to the database
-			doc.save()
+			doc.save(ignore_permissions=True)
 
 			# send SMS confirmation
 			self.send_sms_confirmation()
@@ -295,7 +295,7 @@ def update_booking_status(slot=None):
 
 			if doc.status != status:
 				doc.status = status
-				doc.save()
+				doc.save(ignore_permissions=True)
 
 @frappe.whitelist(allow_guest=True)
 def get_slot_subscription(email_id, slot_id):
