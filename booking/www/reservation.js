@@ -57,8 +57,8 @@ frappe.ready(function() {
 					}
 
 					$('[name="slot"]').append($('<option>').val(row.name).text((row.time_slot_display || row.name)
-						+((!row.location) ? '' : ' '+row.location)
 						+((activity) ? '' : " | "+row.type.toUpperCase())
+						+((!row.location) ? '' : ' '+row.location)
 						+" | "+available_message)
 						.attr('available_places',row.available_places).attr('subscription_places',row.subscription_places)
 						.attr('practical_information',row.practical_information));
