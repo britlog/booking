@@ -35,19 +35,13 @@ def get_activities():
 @frappe.whitelist(allow_guest=True)
 def get_slots(activity):
 
-	if activity:
-		slots = frappe.get_all("Booking Slot",
-			fields=["name", "time_slot_display", "type", "location", "available_places", "total_places", "practical_information"],
-			filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
-					 ["Booking Slot", "show_in_website", "=", 1],
-					 ["Booking Slot", "type", "=", activity]],
-			order_by="time_slot asc")
-	else:
-		slots = frappe.get_all("Booking Slot",
-		   fields=["name", "time_slot_display", "type", "location", "available_places", "total_places", "practical_information"],
-		   filters=[["Booking Slot", "time_slot", ">", datetime.datetime.now()],
-					["Booking Slot", "show_in_website", "=", 1]],
-		   order_by="time_slot asc")
+	slots = frappe.db.sql("""
+		select	name, time_slot_display, type, location, available_places, total_places,
+			practical_information, is_replay 
+		from `tabBooking Slot`
+		where (time_slot > NOW() or is_replay = 1) and show_in_website = 1
+			  and type = case when %(activity)s != '' then %(activity)s else type end
+		order by time_slot asc""",{"activity": activity}, as_dict=True)
 
 	for slot in slots:
 		slot['subscription_places'] = slot.get('total_places') \
