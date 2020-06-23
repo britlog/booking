@@ -27,10 +27,10 @@ def get_introduction():
 def get_activities():
 
 	return frappe.db.sql("""
-		select	distinct BS.type 
-		from `tabBooking Slot` BS
-		where time_slot > NOW() and show_in_website = 1
-		order by BS.type""")
+		select distinct type 
+		from `tabBooking Slot`
+		where (time_slot > NOW() or is_replay = 1) and show_in_website = 1
+		order by type""")
 
 @frappe.whitelist(allow_guest=True)
 def get_slots(activity):
