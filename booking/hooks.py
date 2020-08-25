@@ -21,6 +21,8 @@ app_license = "GNU General Public License"
 # include js, css files in header of web template
 # web_include_css = "/assets/booking/css/booking.css"
 # web_include_js = "/assets/booking/js/booking.js"
+web_include_css = "/assets/booking/css/website.css"
+# web_include_js = "/assets/booking/js/shopping_cart.js"
 
 # Home Pages
 # ----------
