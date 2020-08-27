@@ -88,7 +88,10 @@ web_include_css = "/assets/booking/css/website.css"
 doc_events = {
      "Payment Request": {
          "on_change": "booking.booking.doctype.booking.booking.update_payment_status"
-     }
+     },
+	"Sales Order": {
+		"after_insert": "booking.booking.doctype.booking_subscription.booking_subscription.create_subscription"
+	}
 }
 
 # doctype_js = {

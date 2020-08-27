@@ -34,18 +34,7 @@
 </div>
 <div class="row">
     <div class="col-sm-6">
-		<p class='small' style='padding-top: 15px;'>
-		<!--{% if doc.doctype == 'Supplier Quotation' %}-->
-			<!--<b>{{ doc.supplier_name}}</b>-->
-		<!--{% else %}-->
-			<!--<b>{{ doc.customer_name}}</b>-->
-		<!--{% endif %}-->
-		{% if doc.contact_display %}
-			<!--<br>-->
-			{{ doc.contact_display }}
-		{% endif %}
-		</p>
-		{{ frappe.get_doc("Shopping Cart Settings").order_confirmation }}
+		<p>{{ frappe.get_doc("Shopping Cart Settings").order_confirmation }}</p>
 	</div>
     <div class="col-sm-6">
 		{% if enabled_checkout %}

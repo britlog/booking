@@ -5,6 +5,8 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe.utils import now_datetime
+import datetime
 
 class BookingSubscription(Document):
 	pass
@@ -191,3 +193,22 @@ def report_absence(slot, subscription_id, booking_no):
 	doc.save(ignore_permissions=True)
 
 	return True
+
+def create_subscription(doc, method):
+	if doc.order_type == "Shopping Cart":
+		for item in doc.items:
+			doc_item = frappe.get_doc("Item", item.item_code)
+			if doc_item.create_subscription:
+				date_now = datetime.datetime.now().date()
+				doc_subscription = frappe.get_doc({
+					"doctype": "Booking Subscription",
+					"customer": doc.customer,
+					"reference": item.item_code,
+					"activity": doc_item.subscription_activity,
+					"comment": "Créé automatiquement",
+					"subscribed_classes": doc_item.subscription_classes,
+					"remaining_classes": doc_item.subscription_classes,
+					"start_date": date_now,
+					"end_date": date_now + datetime.timedelta(weeks = doc_item.subscription_validity_weeks)
+				})
+				doc_subscription.insert(ignore_permissions=True)
