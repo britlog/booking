@@ -90,6 +90,7 @@ doc_events = {
          "on_change": "booking.booking.doctype.booking.booking.update_payment_status"
      },
 	"Sales Order": {
+		"before_insert": "booking.booking.doctype.booking_subscription.booking_subscription.set_delivery_date",
 		"after_insert": "booking.booking.doctype.booking_subscription.booking_subscription.create_subscription"
 	}
 }

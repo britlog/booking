@@ -194,6 +194,12 @@ def report_absence(slot, subscription_id, booking_no):
 
 	return True
 
+def set_delivery_date(doc, method):
+	if doc.order_type == "Shopping Cart":
+		doc.delivery_date = datetime.datetime.now().date()
+		for item in doc.items:
+			item.delivery_date = doc.delivery_date
+
 def create_subscription(doc, method):
 	if doc.order_type == "Shopping Cart":
 		for item in doc.items:
