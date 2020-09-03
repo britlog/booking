@@ -209,6 +209,7 @@ def create_subscription(doc, method):
 				doc_subscription = frappe.get_doc({
 					"doctype": "Booking Subscription",
 					"customer": doc.customer,
+					"email_id": doc.contact_email,
 					"reference": item.item_code,
 					"activity": doc_item.subscription_activity,
 					"comment": "Créé automatiquement",
