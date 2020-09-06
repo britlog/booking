@@ -223,7 +223,7 @@ def update_payment_status(pr_doc, method):
 		if booking_name:
 			booking_doc = frappe.get_doc("Booking", booking_name)
 			booking_doc.status = "Confirmed"
-			booking_doc.save()
+			booking_doc.save(ignore_permissions=True)
 
 			slot_doc = frappe.get_doc("Booking Slot", booking_doc.slot)
 			slot_doc.append("bookings", {
@@ -233,7 +233,7 @@ def update_payment_status(pr_doc, method):
 
 			# decrease available places
 			slot_doc.available_places -= 1
-			slot_doc.save()
+			slot_doc.save(ignore_permissions=True)
 
 			# send SMS confirmation
 			booking_doc.send_sms_confirmation()
