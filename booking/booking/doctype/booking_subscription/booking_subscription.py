@@ -7,6 +7,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import now_datetime
 import datetime
+from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note
 
 class BookingSubscription(Document):
 	pass
@@ -219,3 +220,16 @@ def create_subscription(doc, method):
 					"end_date": date_now + datetime.timedelta(weeks = doc_item.subscription_validity_weeks)
 				})
 				doc_subscription.insert(ignore_permissions=True)
+
+def make_delivery_note_shopping_cart():
+
+	# make delivery note for shopping cart orders
+	orders = frappe.get_all("Sales Order",
+				filters=[["order_type", "=", "Shopping Cart"], ["delivery_date", "<", now_datetime()],
+						 ["status", "in", ["To Deliver", "To Deliver and Bill"]]],
+				fields=['name'])
+
+	for order in orders:
+		dn = make_delivery_note(order.name)
+		dn = dn.insert()
+		dn.submit()

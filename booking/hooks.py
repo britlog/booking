@@ -108,6 +108,7 @@ scheduler_events = {
 	],
 	"daily": [
 		"booking.booking.doctype.booking_subscription.booking_subscription.update_subscriptions",
+		"booking.booking.doctype.booking_subscription.booking_subscription.make_delivery_note_shopping_cart",
 		"booking.booking.doctype.booking.booking.convert_sales_order"
 	]
 }
