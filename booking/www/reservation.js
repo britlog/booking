@@ -83,6 +83,53 @@ frappe.ready(function() {
         return (id.search("^0[1-9][0-9]{8}$")==-1) ? 0 : 1;
     }
 
+	function display_payment() {
+		// Check subscription validity if any
+		frappe.call({
+            method: 'booking.booking.doctype.booking.booking.get_slot_subscription',
+            args: {
+                'email_id': $('[name="email_id"]').val(),
+                'slot_id': $('[name="slot"]').val()
+            },
+            callback: function(r) {
+//                console.log(r.message);
+
+				if (jQuery.isEmptyObject(r.message) || !r.message.is_valid) {
+
+					if (r.message.price) {
+						$('#amount').html("Montant à payer : "+r.message.price);
+					} else {
+						$('#amount').html("");
+					}
+
+					if (r.message.to_bill) {
+						$("#credit-card").prop("checked", true);
+						$('#credit-card-group').show();
+					} else {
+						$('#credit-card-group').hide();
+					}
+
+					if (r.message.allow_payment_on_site) {
+						if (r.message.payment_instruction) {
+							$('label[for=payment-on-site]').html(r.message.payment_instruction);
+						} else {
+							$('label[for=payment-on-site]').html("Paiement sur place");
+						}
+						if (!r.message.to_bill) {
+							$("#payment-on-site").prop("checked", true);
+						}
+						$('#payment-on-site-group').show();
+					} else {
+						$('#payment-on-site-group').hide();
+					}
+
+					$('#payment-group').show();
+
+				} else $('#payment-group').hide();
+            }
+        });
+    }
+
     $('[name="slot"]').change(function () {
 
 		  // display practical information if specified
@@ -109,6 +156,10 @@ frappe.ready(function() {
 		  	frappe.msgprint("Le groupe est complet, cours à la séance uniquement.");
 		  }
 
+		  // email already entered and slot is changed => display payment based on the selected activity
+		  if ($('[name="email_confirm"]').val()) {
+		  	display_payment();
+		  }
      })
 
 	$('[name="type"]').change(function () {
@@ -165,6 +216,10 @@ frappe.ready(function() {
         });
     });
 
+	$('[name="email_confirm"]').change(function () {
+		  display_payment();
+     })
+
     $('.btn-form-submit').on("click", function() {
 		var slot = $('[name="slot"]').val();
 		var fullname = $('[name="full_name"]').val();
@@ -174,6 +229,7 @@ frappe.ready(function() {
 		var phone = $('[name="phone"]').val();
 		var sms = $('[name="confirm_sms"]').is(':checked');
 		var comment = $('[name="comment"]').val();
+		var payment = $('[name="payment"]:checked').val();
 
 		if(!slot) {
 			frappe.msgprint(__("Veuillez choisir un cours."));
@@ -239,7 +295,8 @@ frappe.ready(function() {
 							'city': city,
 							'phone': phone,
 							'sms': sms,
-							'comment': comment
+							'comment': comment,
+							'payment_mode': payment
 						},
 						callback: function(r) {
 							if (!jQuery.isEmptyObject(r.message)){

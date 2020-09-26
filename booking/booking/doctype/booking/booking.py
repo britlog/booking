@@ -10,6 +10,7 @@ from frappe.core.doctype.sms_settings.sms_settings import send_sms
 from frappe.utils import now_datetime
 from erpnext.accounts.doctype.payment_request.payment_request import make_payment_request
 from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note, make_sales_invoice
+from erpnext.utilities.product import get_price
 
 class Booking(Document):
 
@@ -20,9 +21,9 @@ class Booking(Document):
 		subscription = get_slot_subscription(self.email_id, self.slot)
 
 		# payment
-		type_doc = frappe.get_doc("Booking Type", doc.type)
-		if type_doc.accept_payment and (not subscription or not subscription["is_valid"]) and not self.trial_class:
-			# create sales order if no valid subscription
+		if self.payment_mode == "Carte Bancaire":
+			# create sales order
+			type_doc = frappe.get_doc("Booking Type", doc.type)
 			so = make_sales_order(type_doc.billing_customer, type_doc.billing_item, doc.time_slot, doc.time_slot_display,
 								  self.name, self.full_name)
 
@@ -299,6 +300,7 @@ def update_booking_status(slot=None):
 def get_slot_subscription(email_id, slot_id):
 
 	subscription = {}
+	activity = frappe.get_value("Booking Slot", slot_id, 'type')
 
 	subscriptions = frappe.db.sql("""
 		select	C.name as customer, 
@@ -333,7 +335,6 @@ def get_slot_subscription(email_id, slot_id):
 			where BCL.subscription = %(subscription)s and BCL.present = 0 and BCL.cancellation_date is null""",
 						  {"subscription": subscription["subscription"]})[0][0]
 
-		activity = frappe.get_value("Booking Slot", slot_id, 'type')
 		coefficient = frappe.get_value("Booking Type", activity, 'class_coefficient')
 
 		if available_classes < coefficient:
@@ -348,5 +349,29 @@ def get_slot_subscription(email_id, slot_id):
 				and subscription["remaining_catch_up"] <= 0:
 			subscription["is_valid"] = False
 			subscription["warning_msg"] = "Cours hors rattrapage, souhaitez-vous valider la réservation ?"
+
+
+	# get price if no valid subscription
+	type_doc = frappe.get_doc("Booking Type", activity)
+	is_trial = is_trial_class(email_id, activity)
+
+	if (not subscription or not subscription["is_valid"]) and not is_trial:
+		subscription["is_valid"] = False
+
+		if type_doc.accept_payment:
+			item_code = frappe.get_value("Booking Type", activity, 'billing_item')
+			default_price_list = frappe.db.get_single_value('Selling Settings', 'selling_price_list')
+			price = get_price(
+				item_code,
+				default_price_list,
+				None,
+				None
+			)
+			subscription["to_bill"] = True
+			subscription["price"] = price.get("formatted_price")
+
+		if type_doc.allow_payment_on_site:
+			subscription["allow_payment_on_site"] = True
+			subscription["payment_instruction"] = type_doc.payment_instruction
 
 	return subscription

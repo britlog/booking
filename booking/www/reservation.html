@@ -13,11 +13,11 @@
 			<h1>Réservation</h1>
 		</div>
 		<div class="col-sm-4 col-xs-6">
-			<div class="page-header-actions-block">
-				<div style="padding-bottom: 15px;">
-					<button type="submit" class="btn btn-primary btn-sm btn-form-submit">Envoyer</button>
-				</div>
-			</div>
+			<!--<div class="page-header-actions-block">-->
+				<!--<div style="padding-bottom: 15px;">-->
+					<!--<button type="submit" class="btn btn-primary btn-sm btn-form-submit">Réserver</button>-->
+				<!--</div>-->
+			<!--</div>-->
 		</div>
 	</div>
 
@@ -141,6 +141,19 @@
 									data-doctype="Booking" data-default=""></textarea>
 								</div>
 
+								<div class="form-group" id="payment-group" style="display: none;">
+									<p id="amount"></p>
+									<div id="credit-card-group">
+									  <input type="radio" id="credit-card" name="payment" value="Carte Bancaire">
+									  <label for="credit-card">Carte Bancaire</label>
+									</div>
+
+									<div id="payment-on-site-group">
+									  <input type="radio" id="payment-on-site" name="payment" value="Paiement Sur Place">
+									  <label for="payment-on-site">Paiement sur place</label>
+									</div>
+								</div>
+
 							</div>
 
 					</div>
@@ -152,7 +165,7 @@
 					<br>
 					<p class='text-right'><!-- save/next button -->
 
-						<button type="submit" class="btn btn-primary btn-sm btn-form-submit">Envoyer</button>
+						<button type="submit" class="btn btn-primary btn-sm btn-form-submit" style="font-size: 16px;">Réserver</button>
 					</p>
 				</div>
 			</div>

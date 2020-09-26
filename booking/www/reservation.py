@@ -90,7 +90,7 @@ def set_notification(slot, email, name):
 			doc.save()
 
 @frappe.whitelist(allow_guest=True)
-def add_booking(slot, email, name, city, phone, sms, comment):
+def add_booking(slot, email, name, city, phone, sms, comment, payment_mode):
 	validation = {}
 
 	doc = frappe.get_doc({
@@ -101,7 +101,8 @@ def add_booking(slot, email, name, city, phone, sms, comment):
 		"city": city,
 		"phone": phone,
 		"confirm_sms": sms == 'true',
-		"comment": comment
+		"comment": comment,
+		"payment_mode": payment_mode
 	})
 	doc.insert()
 
