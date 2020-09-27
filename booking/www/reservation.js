@@ -125,7 +125,11 @@ frappe.ready(function() {
 
 					$('#payment-group').show();
 
-				} else $('#payment-group').hide();
+				} else {
+					$('#payment-group').hide();
+					$("#credit-card").prop("checked", false);
+					$("#payment-on-site").prop("checked", false);
+				}
             }
         });
     }
@@ -157,7 +161,7 @@ frappe.ready(function() {
 		  }
 
 		  // email already entered and slot is changed => display payment based on the selected activity
-		  if ($('[name="email_confirm"]').val()) {
+		  if ($('[name="email_id"]').val()) {
 		  	display_payment();
 		  }
      })
@@ -216,7 +220,7 @@ frappe.ready(function() {
         });
     });
 
-	$('[name="email_confirm"]').change(function () {
+	$('[name="email_id"]').change(function () {
 		  display_payment();
      })
 
@@ -229,7 +233,12 @@ frappe.ready(function() {
 		var phone = $('[name="phone"]').val();
 		var sms = $('[name="confirm_sms"]').is(':checked');
 		var comment = $('[name="comment"]').val();
-		var payment = $('[name="payment"]:checked').val();
+		var payment = $('[name="payment"]:checked').val() || "";
+
+		// clea payment mode if payment group is hidden
+		if ($('#payment-group').is(":hidden")) {
+			payment = ""
+		}
 
 		if(!slot) {
 			frappe.msgprint(__("Veuillez choisir un cours."));
@@ -274,7 +283,7 @@ frappe.ready(function() {
                 'slot_id': $('[name="slot"]').val()
             },
             callback: function(r) {
-                console.log(r.message);
+//              console.log(r.message);
                 var bCancel = false
 
 				if (!jQuery.isEmptyObject(r.message) && typeof r.message.is_valid !== 'undefined' && !r.message.is_valid) {
