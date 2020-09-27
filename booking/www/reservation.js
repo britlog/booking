@@ -274,10 +274,10 @@ frappe.ready(function() {
                 'slot_id': $('[name="slot"]').val()
             },
             callback: function(r) {
-                //console.log(r.message);
+                console.log(r.message);
                 var bCancel = false
 
-				if (!jQuery.isEmptyObject(r.message) && !r.message.is_valid) {
+				if (!jQuery.isEmptyObject(r.message) && typeof r.message.is_valid !== 'undefined' && !r.message.is_valid) {
 					// subscription is not valid, display a warning
 					if (!confirm(r.message.warning_msg)) {
 						bCancel = true;

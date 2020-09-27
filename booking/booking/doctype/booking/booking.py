@@ -46,8 +46,8 @@ class Booking(Document):
 			doc.append("bookings", {
 				"full_name": self.full_name,
 				"booking": self.name,
-				"subscriber": subscription["customer"] if subscription else "",
-				"subscription": subscription["subscription"] if subscription and subscription["is_valid"] else ""
+				"subscriber": subscription.get("customer", ""),
+				"subscription": subscription.get("subscription", "") if subscription.get("is_valid", False) else ""
 			})
 
 			# decrease available places
@@ -356,7 +356,6 @@ def get_slot_subscription(email_id, slot_id):
 	is_trial = is_trial_class(email_id, activity)
 
 	if (not subscription or not subscription["is_valid"]) and not is_trial:
-		subscription["is_valid"] = False
 
 		if type_doc.accept_payment:
 			item_code = frappe.get_value("Booking Type", activity, 'billing_item')
