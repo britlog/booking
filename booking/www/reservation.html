@@ -81,7 +81,7 @@
 									<input type=text class="form-control" name="email_id" data-fieldname="email_id"
 									data-label="E-mail" data-fieldtype="Data"
 									data-doctype="Booking" data-default=""
-									data-reqd=1 value="">
+									data-reqd=1 value="" autocomplete="none">
 
 								</div>
 
@@ -89,7 +89,7 @@
 									<label for="email_confirm" class="control-label text-muted small">Confirmation E-mail</label>
 
 									<input class="form-control" type="email" name="email_confirm"
-										   oncopy="return false" onpaste="return false" oncut="return false">
+										   oncopy="return false" onpaste="return false" oncut="return false" autocomplete="none">
 								</div>
 
 								<div class="form-group has-error">
@@ -144,12 +144,12 @@
 								<div class="form-group" id="payment-group" style="display: none;">
 									<p id="amount"></p>
 									<div id="credit-card-group">
-									  <input type="radio" id="credit-card" name="payment" value="Carte Bancaire">
+									  <input type="radio" id="credit-card" name="payment">
 									  <label for="credit-card">Carte Bancaire</label>
 									</div>
 
 									<div id="payment-on-site-group">
-									  <input type="radio" id="payment-on-site" name="payment" value="Paiement Sur Place">
+									  <input type="radio" id="payment-on-site" name="payment">
 									  <label for="payment-on-site">Paiement sur place</label>
 									</div>
 								</div>

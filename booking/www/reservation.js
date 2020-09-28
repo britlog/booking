@@ -84,54 +84,59 @@ frappe.ready(function() {
     }
 
 	function display_payment() {
-		// Check subscription validity if any
-		frappe.call({
-            method: 'booking.booking.doctype.booking.booking.get_slot_subscription',
-            args: {
-                'email_id': $('[name="email_id"]').val(),
-                'slot_id': $('[name="slot"]').val()
-            },
-            callback: function(r) {
-//                console.log(r.message);
+		// Display payment information
+		email = $('[name="email_id"]').val()
+		slot =  $('[name="slot"]').val()
 
-				if (jQuery.isEmptyObject(r.message) || !r.message.is_valid) {
+		 if (email && slot) {
 
-					if (r.message.price) {
-						$('#amount').html("Montant à payer : "+r.message.price);
-					} else {
-						$('#amount').html("");
-					}
+			frappe.call({
+				method: 'booking.booking.doctype.booking.booking.get_slot_subscription',
+				args: {
+					'email_id': email,
+					'slot_id': slot
+				},
+				callback: function(r) {
 
-					if (r.message.to_bill) {
-						$("#credit-card").prop("checked", true);
-						$('#credit-card-group').show();
-					} else {
-						$('#credit-card-group').hide();
-					}
+					if (jQuery.isEmptyObject(r.message) || !r.message.is_valid) {
 
-					if (r.message.allow_payment_on_site) {
-						if (r.message.payment_instruction) {
-							$('label[for=payment-on-site]').html(r.message.payment_instruction);
+						if (r.message.price) {
+							$('#amount').html("Montant à payer : "+r.message.price);
 						} else {
-							$('label[for=payment-on-site]').html("Paiement sur place");
+							$('#amount').html("");
 						}
-						if (!r.message.to_bill) {
-							$("#payment-on-site").prop("checked", true);
+
+						if (r.message.to_bill) {
+							$("#credit-card").prop("checked", true);
+							$('#credit-card-group').show();
+						} else {
+							$('#credit-card-group').hide();
 						}
-						$('#payment-on-site-group').show();
+
+						if (r.message.allow_payment_on_site) {
+							if (r.message.payment_instruction) {
+								$('label[for=payment-on-site]').html(r.message.payment_instruction);
+							} else {
+								$('label[for=payment-on-site]').html("Paiement sur place");
+							}
+							if (!r.message.to_bill) {
+								$("#payment-on-site").prop("checked", true);
+							}
+							$('#payment-on-site-group').show();
+						} else {
+							$('#payment-on-site-group').hide();
+						}
+
+						$('#payment-group').show();
+
 					} else {
-						$('#payment-on-site-group').hide();
+						$('#payment-group').hide();
+						$("#credit-card").prop("checked", false);
+						$("#payment-on-site").prop("checked", false);
 					}
-
-					$('#payment-group').show();
-
-				} else {
-					$('#payment-group').hide();
-					$("#credit-card").prop("checked", false);
-					$("#payment-on-site").prop("checked", false);
 				}
-            }
-        });
+			});
+        }
     }
 
     $('[name="slot"]').change(function () {
@@ -160,10 +165,8 @@ frappe.ready(function() {
 		  	frappe.msgprint("Le groupe est complet, cours à la séance uniquement.");
 		  }
 
-		  // email already entered and slot is changed => display payment based on the selected activity
-		  if ($('[name="email_id"]').val()) {
-		  	display_payment();
-		  }
+		  // display payment based on the selected activity
+	      display_payment();
      })
 
 	$('[name="type"]').change(function () {
@@ -233,9 +236,9 @@ frappe.ready(function() {
 		var phone = $('[name="phone"]').val();
 		var sms = $('[name="confirm_sms"]').is(':checked');
 		var comment = $('[name="comment"]').val();
-		var payment = $('[name="payment"]:checked').val() || "";
+		var payment = $('[name="payment"]:checked + label').text() || "";
 
-		// clea payment mode if payment group is hidden
+		// clear payment mode if payment group is hidden
 		if ($('#payment-group').is(":hidden")) {
 			payment = ""
 		}
