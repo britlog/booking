@@ -49,7 +49,7 @@ def get_slots(activity):
 			BS.practical_information, 1 as is_replay 
 		from `tabBooking Slot` BS
 		inner join `tabBooking Type` BT ON BS.Type = BT.name 
-		where BT.allow_replay = 1 and DATE_ADD(BS.time_slot, INTERVAL BT.replay_period DAY) > NOW() 
+		where BS.time_slot <= NOW() and BT.allow_replay = 1 and DATE_ADD(BS.time_slot, INTERVAL BT.replay_period DAY) > NOW() 
 			and BS.show_in_website = 1 and BS.type = case when %(activity)s != '' then %(activity)s else BS.type end
 		order by time_slot asc""",{"activity": activity}, as_dict=True)
 
