@@ -27,20 +27,30 @@ def get_introduction():
 def get_activities():
 
 	return frappe.db.sql("""
-		select distinct type 
-		from `tabBooking Slot`
-		where (time_slot > NOW() or is_replay = 1) and show_in_website = 1
-		order by type""")
+		select distinct BS.type 
+		from `tabBooking Slot` BS
+		inner join `tabBooking Type` BT ON BS.Type = BT.name
+		where (BS.time_slot > NOW() or (BT.allow_replay = 1 and DATE_ADD(BS.time_slot, INTERVAL BT.replay_period DAY) > NOW())) 
+			and BS.show_in_website = 1
+		order by BS.type""")
 
 @frappe.whitelist(allow_guest=True)
 def get_slots(activity):
 
 	slots = frappe.db.sql("""
-		select	name, time_slot_display, type, location, available_places, total_places,
-			practical_information, is_replay 
-		from `tabBooking Slot`
-		where (time_slot > NOW() or is_replay = 1) and show_in_website = 1
-			  and type = case when %(activity)s != '' then %(activity)s else type end
+		select	BS.name, BS.time_slot, BS.time_slot_display, BS.type, BS.location, BS.available_places, BS.total_places,
+			BS.practical_information, 0 as is_replay 
+		from `tabBooking Slot` BS
+		inner join `tabBooking Type` BT ON BS.Type = BT.name 
+		where BS.time_slot > NOW() 
+			and BS.show_in_website = 1 and BS.type = case when %(activity)s != '' then %(activity)s else BS.type end
+		union
+		select	BS.name, BS.time_slot, BS.time_slot_display, BS.type, BS.location, BS.available_places, BS.total_places,
+			BS.practical_information, 1 as is_replay 
+		from `tabBooking Slot` BS
+		inner join `tabBooking Type` BT ON BS.Type = BT.name 
+		where BT.allow_replay = 1 and DATE_ADD(BS.time_slot, INTERVAL BT.replay_period DAY) > NOW() 
+			and BS.show_in_website = 1 and BS.type = case when %(activity)s != '' then %(activity)s else BS.type end
 		order by time_slot asc""",{"activity": activity}, as_dict=True)
 
 	for slot in slots:
