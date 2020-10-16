@@ -87,6 +87,7 @@ frappe.ready(function() {
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Réservation</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Présence</th>'
 						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Annulation</th>'
+						tableData+='<th bgcolor="#FFD996" style="padding: 15px;border: 1px solid black;text-align: center;">Lien YouTube</th>'
 						tableData+='</tr>';
 						(r.message || []).forEach(function(row){
 								tableData += '<tr>';
@@ -115,7 +116,14 @@ frappe.ready(function() {
 									if (TimeSlotDate > CurrentDate)
 										tableData += '<td style="text-align: center;padding: 5px;"><input class="btn btn-primary" type="button" id="'+ row.slot +'" \
 												 value="Signaler une absence" onclick="cancel_class(this.id,\''+row.booking_no+'\');"></td>';
+									else
+										tableData += '<td></td>';
 								}
+								else
+									tableData += '<td></td>';
+
+								if (row.streaming_link)
+									tableData += '<td style="text-align: center;padding: 5px;"><a class="btn btn-primary" href="'+row.streaming_link+'" target="_blank">VOIR LA VIDEO</a></td>';
 								tableData += '</tr>';
 						});
 						$('#matable').html(tableData).toggle(true);
