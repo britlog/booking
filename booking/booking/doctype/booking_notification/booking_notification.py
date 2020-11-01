@@ -66,7 +66,8 @@ def send_streaming_link():
 			from `tabBooking Slot` BSL
 			inner join `tabBooking Subscriber` BSU on BSL.name = BSU.parent
 			inner join `tabBooking Subscription` BSN on BSU.subscription = BSN.name
-			where BSL.time_slot > NOW() and IFNULL(BSL.streaming_link, "") != "" and BSU.notification_date is null""", as_dict=True)
+			where BSL.time_slot > NOW() and IFNULL(BSL.streaming_link, "") != "" 
+			and BSU.cancellation_date is null and BSU.notification_date is null""", as_dict=True)
 
 	if notifications:
 
