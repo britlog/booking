@@ -110,6 +110,9 @@ scheduler_events = {
 		"booking.booking.doctype.booking_subscription.booking_subscription.update_subscriptions",
 		"booking.booking.doctype.booking_subscription.booking_subscription.make_delivery_note_shopping_cart",
 		"booking.booking.doctype.booking.booking.convert_sales_order"
+	],
+	"hourly": [
+		"booking.booking.doctype.booking_notification.booking_notification.send_streaming_link"
 	]
 }
 # scheduler_events = {

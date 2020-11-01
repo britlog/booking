@@ -17,6 +17,7 @@ TODO,Request Date,Date de Demande
 TODO,Sending Date,Date d'Envoi
 TODO,Subscription,Abonnement
 TODO,Cancellation Date,Date d'Annulation
+TODO,Notification Date,Date de Notification
 TODO,Booking Type,Type de Réservation
 TODO,Default Places,Places par Défaut
 TODO,Allow Trial Class,Autoriser un Cours d'Essai
@@ -25,6 +26,7 @@ TODO,Trial Class,Cours d'Essai
 TODO,Counter,Compteur
 TODO,Booking Settings,Paramètres de Réservation
 TODO,Waiting List Notification,Notification Liste d'Attente
+TODO,Streaming Link Notification,Notification Lien du Streaming
 TODO,Bookings,Réservations
 TODO,Waiting List,Liste d'Attente
 TODO,Booking Form Introduction,Introduction du Formulaire de Réservation
