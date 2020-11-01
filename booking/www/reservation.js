@@ -98,8 +98,7 @@ frappe.ready(function() {
 				},
 				callback: function(r) {
 
-					if (jQuery.isEmptyObject(r.message) || !r.message.is_valid) {
-
+					if (!jQuery.isEmptyObject(r.message) && !r.message.is_valid) {
 						if (r.message.price) {
 							$('#amount').html("Montant à payer : "+r.message.price);
 						} else {
