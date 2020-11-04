@@ -39,24 +39,22 @@ def update_subscriptions(slot=None):
 		# update presence first
 		if frappe.db.get_single_value('Booking Settings', 'enable_auto_attendance'):
 			frappe.db.sql("""
-				UPDATE `tabBooking Subscriber` BSU 
-				INNER JOIN `tabBooking Subscription` BSN ON BSU.subscription = BSN.name 
-				INNER JOIN `tabBooking Slot` BSL ON BSU.parent = BSL.name
-				INNER JOIN `tabBooking Type` BT ON BSL.Type = BT.name
-				SET BSU.present = 1
-				WHERE (BSU.cancellation_date IS NULL 
-				OR BSU.cancellation_date > DATE_ADD(BSL.time_slot, INTERVAL -BT.cancellation_period HOUR)) 
-				AND BSU.present = 0 AND BSN.disabled = 0 AND BSL.time_slot < NOW()""")
+				update `tabBooking Subscriber` BSU 
+				inner join `tabBooking Subscription` BSN on BSU.subscription = BSN.name 
+				inner join `tabBooking Slot` BSL on BSU.parent = BSL.name
+				set BSU.present = 1
+				where (BSU.cancellation_date is null 
+				or BSU.cancellation_date > DATE_ADD(BSL.time_slot, INTERVAL -BSU.cancellation_period HOUR)) 
+				and BSU.present = 0 and BSN.disabled = 0 and BSL.time_slot < NOW()""")
 
 			frappe.db.sql("""
-				UPDATE `tabBooking Class` BCL 
-				INNER JOIN `tabBooking Subscription` BSN ON BCL.subscription = BSN.name 
-				INNER JOIN `tabBooking Slot` BSL ON BCL.parent = BSL.name
-				INNER JOIN `tabBooking Type` BT ON BSL.Type = BT.name
-				SET BCL.present = 1
-				WHERE (BCL.cancellation_date IS NULL 
-				OR BCL.cancellation_date > DATE_ADD(BSL.time_slot, INTERVAL -BT.cancellation_period HOUR)) 
-				AND BCL.present = 0 AND BSN.disabled = 0 AND BSL.time_slot < NOW()""")
+				update `tabBooking Class` BCL 
+				inner join `tabBooking Subscription` BSN on BCL.subscription = BSN.name 
+				inner join `tabBooking Slot` BSL on BCL.parent = BSL.name
+				set BCL.present = 1
+				where (BCL.cancellation_date is null 
+				or BCL.cancellation_date > DATE_ADD(BSL.time_slot, INTERVAL -BCL.cancellation_period HOUR)) 
+				and BCL.present = 0 and BSN.disabled = 0 and BSL.time_slot < NOW()""")
 
 			frappe.db.commit()
 
@@ -179,13 +177,19 @@ def report_absence(slot, subscription_id, booking_no):
 
 	if booking_no:
 		frappe.db.sql("""
-			update `tabBooking Class` SET cancellation_date = NOW()
-			where parent = %(parent)s and subscription = %(subscription)s """,
+			update `tabBooking Class` BCL
+			inner join `tabBooking Slot` BSL ON BCL.parent = BSL.name
+			inner join `tabBooking Type` BT ON BSL.Type = BT.name
+			SET BCL.cancellation_date = NOW(), BCL.cancellation_period = BT.cancellation_period 
+			where BCL.parent = %(parent)s and BCL.subscription = %(subscription)s """,
 			{"parent": slot, "subscription": subscription_id})
 	else:
 		frappe.db.sql("""
-			update `tabBooking Subscriber` SET cancellation_date = NOW()
-			where parent = %(parent)s and subscription = %(subscription)s """,
+			update `tabBooking Subscriber` BSU
+			inner join `tabBooking Slot` BSL ON BSU.parent = BSL.name
+			inner join `tabBooking Type` BT ON BSL.Type = BT.name
+			SET BSU.cancellation_date = NOW(), BSU.cancellation_period = BT.cancellation_period 
+			where BSU.parent = %(parent)s and BSU.subscription = %(subscription)s """,
 			{"parent":slot, "subscription": subscription_id})
 
 	frappe.db.commit()
