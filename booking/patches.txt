@@ -1,0 +1,1 @@
+booking.patches.set_class_coefficient

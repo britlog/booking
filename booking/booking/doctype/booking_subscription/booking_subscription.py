@@ -39,16 +39,24 @@ def update_subscriptions(slot=None):
 		# update presence first
 		if frappe.db.get_single_value('Booking Settings', 'enable_auto_attendance'):
 			frappe.db.sql("""
-				UPDATE `tabBooking Subscriber` BSU INNER JOIN `tabBooking Slot` BSL ON BSU.parent = BSL.name
+				UPDATE `tabBooking Subscriber` BSU 
+				INNER JOIN `tabBooking Subscription` BSN ON BSU.subscription = BSN.name 
+				INNER JOIN `tabBooking Slot` BSL ON BSU.parent = BSL.name
+				INNER JOIN `tabBooking Type` BT ON BSL.Type = BT.name
 				SET BSU.present = 1
-				WHERE BSU.subscription IS NOT NULL AND BSU.cancellation_date IS NULL AND BSU.present = 0
-					AND BSL.time_slot < NOW()""")
+				WHERE (BSU.cancellation_date IS NULL 
+				OR BSU.cancellation_date > DATE_ADD(BSL.time_slot, INTERVAL -BT.cancellation_period HOUR)) 
+				AND BSU.present = 0 AND BSN.disabled = 0 AND BSL.time_slot < NOW()""")
 
 			frappe.db.sql("""
-				UPDATE `tabBooking Class` BCL INNER JOIN `tabBooking Slot` BSL ON BCL.parent = BSL.name
+				UPDATE `tabBooking Class` BCL 
+				INNER JOIN `tabBooking Subscription` BSN ON BCL.subscription = BSN.name 
+				INNER JOIN `tabBooking Slot` BSL ON BCL.parent = BSL.name
+				INNER JOIN `tabBooking Type` BT ON BSL.Type = BT.name
 				SET BCL.present = 1
-				WHERE BCL.subscription IS NOT NULL AND BCL.cancellation_date IS NULL AND BCL.present = 0
-					AND BSL.time_slot < NOW()""")
+				WHERE (BCL.cancellation_date IS NULL 
+				OR BCL.cancellation_date > DATE_ADD(BSL.time_slot, INTERVAL -BT.cancellation_period HOUR)) 
+				AND BCL.present = 0 AND BSN.disabled = 0 AND BSL.time_slot < NOW()""")
 
 			frappe.db.commit()
 
@@ -78,16 +86,12 @@ def get_remaining_classes(subscribed_classes, subscription):
 
 	# remaining classes
 	classes = int(subscribed_classes) \
-		- frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
+		- frappe.db.sql("""select ifnull(SUM(BSU.class_coefficient),0) 
 			from `tabBooking Subscriber` BSU
-			inner join `tabBooking Slot` BSL ON BSU.parent = BSL.name
-			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
 			where BSU.subscription = %(subscription)s and BSU.present = 1""",
 			{"subscription": subscription})[0][0] \
-		- frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
+		- frappe.db.sql("""select ifnull(SUM(BCL.class_coefficient),0) 
 			from `tabBooking Class` BCL
-			inner join `tabBooking Slot` BSL ON BCL.parent = BSL.name
-			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
 			where BCL.subscription = %(subscription)s and BCL.present = 1""",
 			{"subscription": subscription})[0][0]
 
@@ -101,7 +105,7 @@ def get_remaining_catch_up(allowed_catch_up, subscription):
 
 	# remaining catch up
 	catch_up = int(allowed_catch_up) \
-		- frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
+		- frappe.db.sql("""select ifnull(SUM(BCL.class_coefficient),0) 
 			from `tabBooking Class` BCL
 			inner join `tabBooking Slot` BSL ON BCL.parent = BSL.name
 			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
@@ -138,7 +142,7 @@ def get_classes(subscription_id):
 		BS.name AS slot,
 		BS.time_slot_display,
 		BS.type AS style,
-		BT.class_coefficient,
+		TBS.class_coefficient,
 		BS.time_slot,
 		TBS.present,
 		"" AS booking_no,
@@ -155,7 +159,7 @@ def get_classes(subscription_id):
 		BS.name AS slot,
 		BS.time_slot_display,
 		BS.type AS style,
-		BT.class_coefficient,
+		TBC.class_coefficient,
 		BS.time_slot,
 		TBC.present,
 		IFNULL(TBC.booking,'') AS booking_no,
@@ -214,7 +218,7 @@ def create_subscription(doc, method):
 					"customer": doc.customer,
 					"email_id": doc.contact_email,
 					"reference": item.item_code,
-					"activity": doc_item.subscription_activity,
+					"activities": doc_item.subscription_activities,
 					"comment": "Créé automatiquement",
 					"subscribed_classes": doc_item.subscription_classes,
 					"remaining_classes": doc_item.subscription_classes,
@@ -227,11 +231,23 @@ def make_delivery_note_shopping_cart():
 
 	# make delivery note for shopping cart orders
 	orders = frappe.get_all("Sales Order",
-				filters=[["order_type", "=", "Shopping Cart"], ["delivery_date", "<", now_datetime()],
-						 ["status", "in", ["To Deliver", "To Deliver and Bill"]]],
-				fields=['name'])
+		filters=[["order_type", "=", "Shopping Cart"], ["delivery_date", "<", now_datetime()],
+				 ["status", "in", ["To Deliver", "To Deliver and Bill"]]],
+		fields=['name'])
 
 	for order in orders:
 		dn = make_delivery_note(order.name)
 		dn = dn.insert()
 		dn.submit()
+
+@frappe.whitelist()
+def get_class_coefficient(subscription, activity):
+
+	coefficient = frappe.db.sql("""
+		select ifnull(BSA.class_coefficient, (select class_coefficient from `tabBooking Type` where name = %(activity)s)) 
+		from `tabBooking Subscription` BSU
+		left join `tabBooking Subscription Activity` BSA ON BSU.name = BSA.parent and BSA.activity = %(activity)s		
+		where BSU.name = %(subscription)s""",
+		  {"subscription": subscription, "activity": activity})
+
+	return coefficient[0][0] if coefficient else 1

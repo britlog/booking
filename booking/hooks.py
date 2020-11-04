@@ -95,9 +95,10 @@ doc_events = {
 	}
 }
 
-# doctype_js = {
-#     "Customer": ["booking/custom_scripts/customer.js"]
-# }
+doctype_js = {
+    # "Customer": ["booking/custom_scripts/customer.js"]
+	"Item": ["booking/custom_scripts/item.js"]
+}
 
 # Scheduled Tasks
 # ---------------

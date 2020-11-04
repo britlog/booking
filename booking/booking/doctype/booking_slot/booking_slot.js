@@ -63,6 +63,44 @@ frappe.ui.form.on("Booking Class", "present", function(frm,cdt,cdn) {
 
 });
 
+frappe.ui.form.on("Booking Subscriber", "subscription", function(frm,cdt,cdn) {
+
+	var row = locals[cdt][cdn];
+	if (row.subscription) {
+		frappe.call({
+			method: "booking.booking.doctype.booking_subscription.booking_subscription.get_class_coefficient",
+			args: {
+				subscription: row.subscription,
+				activity: frm.doc.type
+			},
+			callback: function(r) {
+				row.class_coefficient = r.message;
+				refresh_field("subscribers");
+			}
+		});
+	}
+
+});
+
+frappe.ui.form.on("Booking Class", "subscription", function(frm,cdt,cdn) {
+
+	var row = locals[cdt][cdn];
+	if (row.subscription) {
+		frappe.call({
+			method: "booking.booking.doctype.booking_subscription.booking_subscription.get_class_coefficient",
+			args: {
+				subscription: row.subscription,
+				activity: frm.doc.type
+			},
+			callback: function(r) {
+				row.class_coefficient = r.message;
+				refresh_field("bookings");
+			}
+		});
+	}
+
+});
+
 frappe.ui.form.on("Booking Subscriber", "cancellation_date", function(frm,cdt,cdn) {
     frm.trigger("total_places");
 });

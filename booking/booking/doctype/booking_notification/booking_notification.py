@@ -34,28 +34,29 @@ def send_notification_email():
 			where BS.time_slot > NOW() and BS.available_places > 0 and BN.sending_date is null""", as_dict=True)
 
 	if notifications:
-
 		waiting_list_notification = frappe.db.get_single_value('Booking Settings', 'waiting_list_notification')
-		email_template = frappe.get_doc("Email Template", waiting_list_notification)
 
-		for notification in notifications:
+		if waiting_list_notification:
+			email_template = frappe.get_doc("Email Template", waiting_list_notification)
 
-			args = frappe.get_doc('Booking Slot', notification.slot).as_dict()
-			message = frappe.render_template(email_template.response, args)
-			subject = frappe.render_template(email_template.subject, args)
+			for notification in notifications:
 
-			try:
-				frappe.sendmail(
-					recipients=notification.email_id,
-					message=message,
-					subject=subject)
-			except Exception as e:
-				frappe.log_error(frappe.get_traceback(), 'waiting list notification email failed')
+				args = frappe.get_doc('Booking Slot', notification.slot).as_dict()
+				message = frappe.render_template(email_template.response, args)
+				subject = frappe.render_template(email_template.subject, args)
 
-			frappe.db.sql("""
-				update `tabBooking Notification` set sending_date = NOW(), counter = IFNULL(counter,0) + 1 
-				where parent = %(parent)s and email_id = %(email)s and sending_date is null """,
-				{"parent": notification.slot,"email":notification.email_id})
+				try:
+					frappe.sendmail(
+						recipients=notification.email_id,
+						message=message,
+						subject=subject)
+				except Exception as e:
+					frappe.log_error(frappe.get_traceback(), 'waiting list notification email failed')
+
+				frappe.db.sql("""
+					update `tabBooking Notification` set sending_date = NOW(), counter = IFNULL(counter,0) + 1 
+					where parent = %(parent)s and email_id = %(email)s and sending_date is null """,
+					{"parent": notification.slot,"email":notification.email_id})
 
 def send_streaming_link():
 	"""
@@ -70,25 +71,26 @@ def send_streaming_link():
 			and BSU.cancellation_date is null and BSU.notification_date is null""", as_dict=True)
 
 	if notifications:
-
 		streaming_link_notification = frappe.db.get_single_value('Booking Settings', 'streaming_link_notification')
-		email_template = frappe.get_doc("Email Template", streaming_link_notification)
 
-		for notification in notifications:
+		if streaming_link_notification:
+			email_template = frappe.get_doc("Email Template", streaming_link_notification)
 
-			args = frappe.get_doc('Booking Slot', notification.slot).as_dict()
-			message = frappe.render_template(email_template.response, args)
-			subject = frappe.render_template(email_template.subject, args)
+			for notification in notifications:
 
-			try:
-				frappe.sendmail(
-					recipients=notification.email_id,
-					message=message,
-					subject=subject)
-			except Exception as e:
-				frappe.log_error(frappe.get_traceback(), 'streaming link notification email failed')
+				args = frappe.get_doc('Booking Slot', notification.slot).as_dict()
+				message = frappe.render_template(email_template.response, args)
+				subject = frappe.render_template(email_template.subject, args)
 
-			frappe.db.sql("""
-				update `tabBooking Subscriber` set notification_date = NOW() 
-				where parent = %(parent)s and subscription = %(subscription)s and notification_date is null """,
-				{"parent": notification.slot,"subscription":notification.subscription})
+				try:
+					frappe.sendmail(
+						recipients=notification.email_id,
+						message=message,
+						subject=subject)
+				except Exception as e:
+					frappe.log_error(frappe.get_traceback(), 'streaming link notification email failed')
+
+				frappe.db.sql("""
+					update `tabBooking Subscriber` set notification_date = NOW() 
+					where parent = %(parent)s and subscription = %(subscription)s and notification_date is null """,
+					{"parent": notification.slot,"subscription":notification.subscription})

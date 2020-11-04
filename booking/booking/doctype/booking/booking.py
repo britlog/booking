@@ -3,6 +3,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from __future__ import absolute_import
 import frappe
 from frappe.model.document import Document
 from frappe import throw, _
@@ -11,6 +12,7 @@ from frappe.utils import now_datetime
 from erpnext.accounts.doctype.payment_request.payment_request import make_payment_request
 from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note, make_sales_invoice
 from erpnext.utilities.product import get_price
+from booking.booking.doctype.booking_subscription.booking_subscription import get_class_coefficient
 
 class Booking(Document):
 
@@ -47,7 +49,8 @@ class Booking(Document):
 				"full_name": self.full_name,
 				"booking": self.name,
 				"subscriber": subscription.get("customer", ""),
-				"subscription": subscription.get("subscription", "") if subscription.get("is_valid", False) else ""
+				"subscription": subscription.get("subscription", "") if subscription.get("is_valid", False) else "",
+				"class_coefficient": get_class_coefficient(subscription.get("subscription", ""), doc.type)
 			})
 
 			# decrease available places
@@ -303,16 +306,13 @@ def get_slot_subscription(email_id, slot_id):
 	activity = frappe.get_value("Booking Slot", slot_id, 'type')
 
 	subscriptions = frappe.db.sql("""
-		select	C.name as customer, 
+		select	BSU.customer as customer, 
 				BSU.name as subscription,
 				BSU.remaining_classes,
 				BSU.remaining_catch_up
 		from `tabBooking Subscription` BSU
-		inner join `tabCustomer` C on BSU.customer = C.name
-		inner join `tabDynamic Link` DL on C.name = DL.link_name
-		inner join `tabContact` CT on DL.parent = CT.name
-		where CT.email_id = %(email)s and BSU.remaining_classes > 0 and BSU.end_date > NOW() and BSU.disabled = 0
-		order by BSU.remaining_catch_up DESC""",
+		where BSU.email_id = %(email)s and BSU.remaining_classes > 0 and BSU.end_date > NOW() and BSU.disabled = 0
+		order by BSU.remaining_catch_up DESC, BSU.start_date""",
 		{"email": email_id}, as_dict=True)
 
 	if subscriptions:
@@ -322,22 +322,16 @@ def get_slot_subscription(email_id, slot_id):
 
 		# available classes = subscription remaining classes - pending bookings
 		available_classes = float(subscription["remaining_classes"]) \
-		  - frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
+		  - frappe.db.sql("""select ifnull(SUM(BSU.class_coefficient),0) 
 			from `tabBooking Subscriber` BSU
-			inner join `tabBooking Slot` BSL ON BSU.parent = BSL.name
-			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
 			where BSU.subscription = %(subscription)s and BSU.present = 0 and BSU.cancellation_date is null""",
 						  {"subscription": subscription["subscription"]})[0][0] \
-		  - frappe.db.sql("""select ifnull(SUM(BTP.class_coefficient),0) 
+		  - frappe.db.sql("""select ifnull(SUM(BCL.class_coefficient),0) 
 			from `tabBooking Class` BCL
-			inner join `tabBooking Slot` BSL ON BCL.parent = BSL.name
-			inner join `tabBooking Type` BTP ON BSL.Type = BTP.name
 			where BCL.subscription = %(subscription)s and BCL.present = 0 and BCL.cancellation_date is null""",
 						  {"subscription": subscription["subscription"]})[0][0]
 
-		coefficient = frappe.get_value("Booking Type", activity, 'class_coefficient')
-
-		if available_classes < coefficient:
+		if available_classes < get_class_coefficient(subscription.get("subscription", ""), activity):
 			# not enough remaining classes for this slot
 			return False
 

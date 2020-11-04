@@ -99,27 +99,29 @@ frappe.ready(function() {
 									if (row.class_coefficient != 1)
 										tableData += ' / ' + row.class_coefficient
 									tableData += '</td>';
-								}
-								else
+								} else
 									tableData += '<td style="text-align: center;"><i class="fa fa-square-o" aria-hidden="true"></i></td>';
 
-								if (row.cancellation_date)
-									tableData += '<td style="text-align: center;">' + row.cancellation_date + '</td>';
-								else if (row.is_cancelable) {
+								if (row.cancellation_date) {
+									tableData += '<td style="text-align: center;">' + row.cancellation_date;
+									if (row.present)
+										tableData += '<br>(Hors délai)'
+									tableData += '</td>';
+								} else if (row.is_cancelable) {
 									var CurrentDate = new Date();
 									var TimeSlotDate = new Date(row.time_slot.replace(/\s/, 'T'));
 
 									// add class cancellation period
-									if (row.cancellation_period > 0)
-										CurrentDate.setHours( CurrentDate.getHours() + row.cancellation_period );
+									// Finally allow cancellation till the class to free up places
+									//if (row.cancellation_period > 0)
+									//	CurrentDate.setHours( CurrentDate.getHours() + row.cancellation_period );
 
 									if (TimeSlotDate > CurrentDate)
 										tableData += '<td style="text-align: center;padding: 5px;"><input class="btn btn-primary" type="button" id="'+ row.slot +'" \
 												 value="Signaler une absence" onclick="cancel_class(this.id,\''+row.booking_no+'\');"></td>';
 									else
 										tableData += '<td></td>';
-								}
-								else
+								} else
 									tableData += '<td></td>';
 
 								if (row.streaming_link)
