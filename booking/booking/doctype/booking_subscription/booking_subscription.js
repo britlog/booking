@@ -45,8 +45,3 @@ frappe.ui.form.on('Booking Subscription', "allowed_catch_up", function(frm) {
 //frappe.ui.form.on('Booking Subscription', "customer", function(frm) {
 //    frm.add_fetch('customer','email_id','email_id');
 //});
-
-// Get class_coefficient when select activity
-frappe.ui.form.on('Booking Subscription Activity', "activity", function(frm) {
-    frm.add_fetch('activity','class_coefficient','class_coefficient');
-});

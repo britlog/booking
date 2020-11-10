@@ -18,7 +18,7 @@ TODO,Sending Date,Date d'Envoi
 TODO,Subscription,Abonnement
 TODO,Cancellation Date,Date d'Annulation
 TODO,Notification Date,Date de Notification
-TODO,Booking Type,Type de Réservation
+TODO,Booking Type,Activité
 TODO,Default Places,Places par Défaut
 TODO,Allow Trial Class,Autoriser un Cours d'Essai
 TODO,The first booking will be marked as Trial,La première réservation sera marquée comme Essai
@@ -64,7 +64,7 @@ TODO,Cancellation Period,Délai d'Annulation
 TODO,Deadline (in hours) before the class begins,Dernier délai (en heures) avant le début du cours
 TODO,Is Replay,Est un Replay
 TODO,Create Subscription,Créer Abonnement
-TODO,Subscription Activity,Activité
+TODO,Subscription Activities Package,Formule d'Activités
 TODO,Subscription Classes,Cours
 TODO,Subscription Validity Weeks,Semaines de Validité
 TODO,Activity,Activité
@@ -74,3 +74,5 @@ TODO,Payment Mode,Mode de Paiement
 TODO,Allow Replay,Autoriser le Replay
 TODO,Replay Period,Période de Consultation
 TODO,Availability period for replay (in days),Période de disponibilité du replay (en jours)
+TODO,Booking Activities Package,Formule d'Activités
+TODO,Activities Package,Formule d'Activités

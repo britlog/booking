@@ -51,6 +51,11 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Booking Activities Package",
+					"description": _("Booking Activities Package."),
+				},
+				{
+					"type": "doctype",
 					"name": "Booking Location",
 					"description": _("Booking Location."),
 				},

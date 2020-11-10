@@ -250,7 +250,8 @@ def get_class_coefficient(subscription, activity):
 	coefficient = frappe.db.sql("""
 		select ifnull(BSA.class_coefficient, (select class_coefficient from `tabBooking Type` where name = %(activity)s)) 
 		from `tabBooking Subscription` BSU
-		left join `tabBooking Subscription Activity` BSA ON BSU.name = BSA.parent and BSA.activity = %(activity)s		
+		left join `tabBooking Activities Package` BAP ON BSU.activities = BAP.name 
+		left join `tabBooking Subscription Activity` BSA ON BAP.name = BSA.parent and BSA.activity = %(activity)s		
 		where BSU.name = %(subscription)s""",
 		  {"subscription": subscription, "activity": activity})
 
