@@ -98,40 +98,56 @@ frappe.ready(function() {
 				},
 				callback: function(r) {
 
-					if (!jQuery.isEmptyObject(r.message) && !r.message.is_valid) {
-						if (r.message.price) {
-							$('#amount').html("Montant à payer : "+r.message.price);
-						} else {
-							$('#amount').html("");
-						}
+					if (!jQuery.isEmptyObject(r.message)) {
+						if (!r.message.is_valid) {
+							//No valid subscription
+							$('#subscription-group').hide();
 
-						if (r.message.to_bill) {
-							$("#credit-card").prop("checked", true);
-							$('#credit-card-group').show();
-						} else {
-							$('#credit-card-group').hide();
-						}
-
-						if (r.message.allow_payment_on_site) {
-							if (r.message.payment_instruction) {
-								$('label[for=payment-on-site]').html(r.message.payment_instruction);
+							if (r.message.price) {
+								$('#amount').html("Montant à payer : "+r.message.price);
 							} else {
-								$('label[for=payment-on-site]').html("Paiement sur place");
+								$('#amount').html("");
 							}
-							if (!r.message.to_bill) {
-								$("#payment-on-site").prop("checked", true);
-							}
-							$('#payment-on-site-group').show();
-						} else {
-							$('#payment-on-site-group').hide();
-						}
 
+							if (r.message.to_bill) {
+								$("#credit-card").prop("checked", true);
+								$('#credit-card-group').show();
+							} else {
+								$('#credit-card-group').hide();
+							}
+
+							if (r.message.allow_payment_on_site) {
+								if (r.message.payment_instruction) {
+									$('label[for=payment-on-site]').html(r.message.payment_instruction);
+								} else {
+									$('label[for=payment-on-site]').html("Paiement sur place");
+								}
+								if (!r.message.to_bill) {
+									$("#payment-on-site").prop("checked", true);
+								}
+								$('#payment-on-site-group').show();
+							} else {
+								$('#payment-on-site-group').hide();
+							}
+
+						} else {
+							//Subscription is valid
+							$('#credit-card-group').hide();
+							$('#payment-on-site-group').hide();
+							$('#amount').html("");
+
+							$("#subscription").prop("checked", true);
+							$('label[for=subscription]').html('Abonnement '+r.message.subscription+' / '
+								+((r.message.coefficient == 0) ? 'gratuit' : r.message.coefficient));
+							$('#subscription-group').show();
+						}
 						$('#payment-group').show();
 
 					} else {
 						$('#payment-group').hide();
 						$("#credit-card").prop("checked", false);
 						$("#payment-on-site").prop("checked", false);
+						$("#subscription").prop("checked", false);
 					}
 				}
 			});

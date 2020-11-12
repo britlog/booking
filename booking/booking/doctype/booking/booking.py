@@ -331,7 +331,8 @@ def get_slot_subscription(email_id, slot_id):
 			where BCL.subscription = %(subscription)s and BCL.present = 0 and BCL.cancellation_date is null""",
 						  {"subscription": subscription["subscription"]})[0][0]
 
-		if available_classes < get_class_coefficient(subscription.get("subscription", ""), activity):
+		subscription["coefficient"] = get_class_coefficient(subscription.get("subscription", ""), activity)
+		if available_classes < subscription["coefficient"]:
 			# not enough remaining classes for this slot
 			return False
 
