@@ -151,7 +151,7 @@ frappe.ready(function() {
 					}
 				}
 			});
-        }
+        } else $('#payment-group').hide();
     }
 
     $('[name="slot"]').change(function () {
