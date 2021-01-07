@@ -15,9 +15,9 @@ def trigger_notification(slot):
 	"""
 
 	# check if a new place is available
-	last_available_places = frappe.get_value('Booking Slot', slot.name, 'available_places')
+	last_available_places = frappe.get_value('Booking Slot', slot.name, 'available_places') or 0
 
-	if last_available_places <= 0 and int(slot.available_places) > 0:
+	if int(last_available_places) <= 0 and int(slot.available_places) > 0:
 		for notification in slot.get('notifications'):
 			if frappe.db.sql("""select COUNT(*) from `tabBooking` where slot = %(slot)s and email_id = %(email)s""",
 							{"slot": slot.name, "email": notification.email_id})[0][0] <= 0:
